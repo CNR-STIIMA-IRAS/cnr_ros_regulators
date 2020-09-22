@@ -10,17 +10,22 @@ namespace cnr_fake_regulator
 class FakeRegulator: public cnr_regulator_interface::RegulatorBase
 {
 public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  FakeRegulator();
-  ~FakeRegulator();
+
+  FakeRegulator() = default;
+  virtual ~FakeRegulator() = default;
+  FakeRegulator(const FakeRegulator&) = delete;
+  FakeRegulator& operator=(const FakeRegulator&) = delete;
+  FakeRegulator(FakeRegulator&&) = delete;
+  FakeRegulator& operator=(FakeRegulator&&) = delete;
 
   virtual bool initialize(ros::NodeHandle&   root_nh,
                           ros::NodeHandle&   controller_nh,
                           cnr_logger::TraceLoggerPtr logger,
                           cnr_controller_interface::KinematicsStructPtr kin,
-                          cnr_controller_interface::KinematicStatusPtr  state);
+                          cnr_controller_interface::KinematicStatusPtr  state,
+                          const ros::Duration &period);
 
-  bool update(cnr_interpolator_interface::InterpolatorInterfacePtr interpolator,
+  bool update(cnr_interpolator_interface::InterpolatorInterfacePtr,
               cnr_regulator_interface::RegulatorInputBaseConstPtr input,
               cnr_regulator_interface::RegulatorOutputBasePtr output);
 

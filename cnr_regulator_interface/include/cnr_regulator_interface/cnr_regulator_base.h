@@ -43,7 +43,7 @@
 #include <cnr_logger/cnr_logger.h>
 #include <trajectory_msgs/JointTrajectory.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
-#include <cnr_controller_interface/utils/cnr_kinematic_utils.h>
+#include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
 #include <cnr_interpolator_interface/cnr_interpolator_interface.h>
 #include <cnr_regulator_interface/cnr_regulator_inputs.h>
 #include <cnr_regulator_interface/cnr_regulator_outputs.h>
@@ -66,19 +66,28 @@ public:
                           ros::NodeHandle&   controller_nh,
                           cnr_logger::TraceLoggerPtr logger,
                           cnr_controller_interface::KinematicsStructPtr kin,
-                          cnr_controller_interface::KinematicStatusPtr  state);
+                          cnr_controller_interface::KinematicStatusPtr  state,
+                          const ros::Duration&                          period);
 
-  virtual bool update(cnr_interpolator_interface::InterpolatorInterfacePtr interpolator,
-                      RegulatorInputBaseConstPtr   input,
-                      RegulatorOutputBasePtr       output) = 0;
+  virtual bool update(cnr_interpolator_interface::InterpolatorInterfacePtr /*interpolator*/,
+                      RegulatorInputBaseConstPtr   /*input*/,
+                      RegulatorOutputBasePtr       /*output*/) {return false;}
 
-  virtual bool starting(const ros::Time& time) = 0;
+  virtual bool starting(const ros::Time& /*time*/)
+  {
+    setRegulatorTime(ros::Duration(0.0));
+    return true;
+  }
 
   virtual bool stopping(const ros::Time& /*time*/) {return true;}
 
+  void setRegulatorTime(const ros::Duration& time) { m_regulator_time = time;}
+  const ros::Duration& getRegulatorTime() const { return m_regulator_time; }
 protected:
   cnr_controller_interface::KinematicsStructPtr m_kin;
-  cnr_controller_interface::KinematicStatusPtr  m_state;
+  cnr_controller_interface::KinematicStatusPtr  m_kin_state;
+  ros::Duration                                 m_regulator_time;
+  ros::Duration                                 m_period;
   std::shared_ptr<cnr_logger::TraceLogger>      m_logger;
 };
 
