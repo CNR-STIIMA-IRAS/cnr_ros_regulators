@@ -16,7 +16,6 @@ using cnr_regulator_interface::JointRegulatorInputConstPtr;
 using cnr_regulator_interface::JointRegulatorOutput;
 using cnr_regulator_interface::JointRegulatorOutputPtr;
 
-
 bool FakeRegulator::initialize(ros::NodeHandle&                              root_nh,
                                ros::NodeHandle&                              controller_nh,
                                cnr_logger::TraceLoggerPtr                    logger,
@@ -51,11 +50,11 @@ bool FakeRegulator::update(cnr_interpolator_interface::InterpolatorInterfacePtr 
   interpolator_input->override = j_in->get_target_override();
   interpolator_input->time     = m_regulator_time;
 
-  CNR_INFO_THROTTLE(*m_logger, 20.0
-                    , "SCALED TIME: " + std::to_string(interpolator_input->time.toSec())
-                    + " ovr: "     + std::to_string(interpolator_input->override)
-                    + " scaling: " + std::to_string(j_out->get_scaling())
-                    + " period: "  + std::to_string(m_period.toSec()));
+//  CNR_INFO_THROTTLE(*m_logger, 20.0
+//                    , "SCALED TIME: " + std::to_string(interpolator_input->time.toSec())
+//                    + " ovr: "     + std::to_string(interpolator_input->override)
+//                    + " scaling: " + std::to_string(j_out->get_scaling())
+//                    + " period: "  + std::to_string(m_period.toSec()));
   interpolator->interpolate(interpolator_input, interpolator_output);
 
   m_regulator_time += m_period * j_out->get_scaling();
@@ -76,7 +75,7 @@ bool FakeRegulator::update(cnr_interpolator_interface::InterpolatorInterfacePtr 
   j_out->set_in_goal_tolerance((m_regulator_time-interpolator->trjTime()).toSec()>0);
   j_out->set_time_from_start(m_regulator_time);
 
-  CNR_INFO_THROTTLE(*m_logger, 5, "interpolator output velocities: " << j_out->get_qd().transpose() );
+  //CNR_INFO_THROTTLE(*m_logger, 5, "interpolator output velocities: " << j_out->get_qd().transpose() );
   return true;
 }
 

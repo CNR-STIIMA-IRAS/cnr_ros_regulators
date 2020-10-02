@@ -84,6 +84,7 @@ public:
   void setRegulatorTime(const ros::Duration& time) { m_regulator_time = time;}
   const ros::Duration& getRegulatorTime() const { return m_regulator_time; }
 protected:
+  std::vector<std::string>                      m_controlled_resources;
   cnr_controller_interface::KinematicsStructPtr m_kin;
   cnr_controller_interface::KinematicStatusPtr  m_kin_state;
   ros::Duration                                 m_regulator_time;
