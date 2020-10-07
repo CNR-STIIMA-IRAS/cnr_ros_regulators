@@ -81,9 +81,8 @@ public:
   
 protected:
   
-  std::shared_ptr<cnr_logger::TraceLogger>  m_logger;
+//  std::shared_ptr<cnr_logger::TraceLogger>  m_logger;
   ros::Duration                             m_regulator_time;
-  ros::Duration                             m_period;
   std::vector<std::string>                  m_controlled_resources;
 };
 

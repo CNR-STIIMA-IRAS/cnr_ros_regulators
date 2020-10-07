@@ -106,7 +106,7 @@ public:
                       cnr_regulator_interface::BaseRegulatorInputConstPtr   input,
                       cnr_regulator_interface::BaseRegulatorOutputPtr       output)
   {
-    CNR_TRACE_START(this->m_opts.logger);
+    CNR_TRACE_START_THROTTLE_DEFAULT(this->m_opts.logger);
     if(!cnr_regulator_interface::BaseRegulator::update(interpolator, input, output))
     {
       CNR_RETURN_FALSE(this->m_opts.logger);
@@ -125,7 +125,7 @@ public:
     }
     m_output = out;
     
-    CNR_RETURN_TRUE(this->m_opts.logger);
+    CNR_RETURN_TRUE_THROTTLE_DEFAULT(this->m_opts.logger);
   }
 
   virtual bool stopping(const ros::Time& time) 
@@ -162,7 +162,7 @@ typedef RegulatorInterface<cnr_regulator_interface::JointRegulatorOptions,
 typedef RegulatorInterface<cnr_regulator_interface::CartesianRegulatorOptions,
                            cnr_regulator_interface::CartesianRegulatorState,
                            cnr_regulator_interface::CartesianRegulatorInput,
-                           cnr_regulator_interface::CartesianRegulatorOutput> BaseCartesianRegulator;
+                           cnr_regulator_interface::JointRegulatorOutput> BaseCartesianRegulator;
 
 }
 

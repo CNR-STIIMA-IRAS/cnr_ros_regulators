@@ -37,7 +37,7 @@ bool FakeRegulator::update(cnr_interpolator_interface::InterpolatorInterfacePtr 
                            cnr_regulator_interface::BaseRegulatorInputConstPtr  input,
                            cnr_regulator_interface::BaseRegulatorOutputPtr      output)
 {
-  CNR_TRACE_START(m_opts.logger);
+  CNR_TRACE_START_THROTTLE_DEFAULT(m_opts.logger);
   if(!cnr_regulator_interface::BaseJointRegulator::update(interpolator, input, output))
   {
     CNR_RETURN_FALSE(m_opts.logger);
@@ -67,8 +67,7 @@ bool FakeRegulator::update(cnr_interpolator_interface::InterpolatorInterfacePtr 
   m_output->set_in_goal_tolerance((m_regulator_time-interpolator->trjTime()).toSec()>0);
   m_output->set_time_from_start(m_regulator_time);
 
-  //CNR_INFO_THROTTLE(*m_logger, 5, "interpolator output velocities: " << m_output->get_qd().transpose() );
-  return true;
+  CNR_RETURN_TRUE_THROTTLE_DEFAULT(m_opts.logger);
 }
 
 
