@@ -36,7 +36,6 @@
 #ifndef CNR_REGULATOR_INTERFACE__CNR_REGULATOR_BASE__H
 #define CNR_REGULATOR_INTERFACE__CNR_REGULATOR_BASE__H
 
-#include <pluginlib/class_loader.h>
 #include <ros/node_handle.h>
 #include <eigen3/Eigen/Dense>
 #include <memory>
@@ -45,6 +44,8 @@
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
 #include <cnr_interpolator_interface/cnr_interpolator_interface.h>
+#include <cnr_regulator_interface/cnr_regulator_state.h>
+#include <cnr_regulator_interface/cnr_regulator_options.h>
 #include <cnr_regulator_interface/cnr_regulator_inputs.h>
 #include <cnr_regulator_interface/cnr_regulator_outputs.h>
 
@@ -52,48 +53,41 @@ namespace cnr_regulator_interface
 {
 
 
-class RegulatorBase
+class BaseRegulator
 {
 public:
-  RegulatorBase() = default;
-  virtual ~RegulatorBase() = default;
-  RegulatorBase(const RegulatorBase&) = delete;
-  RegulatorBase& operator=(const RegulatorBase&) = delete;
-  RegulatorBase(RegulatorBase&&) = delete;
-  RegulatorBase& operator=(RegulatorBase&&) = delete;
+  BaseRegulator() = default;
+  virtual ~BaseRegulator() = default;
+  BaseRegulator(const BaseRegulator&) = delete;
+  BaseRegulator& operator=(const BaseRegulator&) = delete;
+  BaseRegulator(BaseRegulator&&) = delete;
+  BaseRegulator& operator=(BaseRegulator&&) = delete;
 
-  virtual bool initialize(ros::NodeHandle&   root_nh,
-                          ros::NodeHandle&   controller_nh,
-                          cnr_logger::TraceLoggerPtr logger,
-                          cnr_controller_interface::KinematicsStructPtr kin,
-                          cnr_controller_interface::KinematicStatusPtr  state,
-                          const ros::Duration&                          period);
+  virtual bool initialize(ros::NodeHandle&  root_nh, 
+                          ros::NodeHandle& controller_nh, 
+                          cnr_regulator_interface::BaseRegulatorOptionsConstPtr opts);
+
+  virtual bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, 
+                        const ros::Time& /*time*/);
 
   virtual bool update(cnr_interpolator_interface::InterpolatorInterfacePtr /*interpolator*/,
-                      RegulatorInputBaseConstPtr   /*input*/,
-                      RegulatorOutputBasePtr       /*output*/) {return false;}
-
-  virtual bool starting(const ros::Time& /*time*/)
-  {
-    setRegulatorTime(ros::Duration(0.0));
-    return true;
-  }
+                      BaseRegulatorInputConstPtr   /*input*/,
+                      BaseRegulatorOutputPtr       /*output*/);
 
   virtual bool stopping(const ros::Time& /*time*/) {return true;}
 
   void setRegulatorTime(const ros::Duration& time) { m_regulator_time = time;}
   const ros::Duration& getRegulatorTime() const { return m_regulator_time; }
+  
 protected:
-  std::vector<std::string>                      m_controlled_resources;
-  cnr_controller_interface::KinematicsStructPtr m_kin;
-  cnr_controller_interface::KinematicStatusPtr  m_kin_state;
-  ros::Duration                                 m_regulator_time;
-  ros::Duration                                 m_period;
-  std::shared_ptr<cnr_logger::TraceLogger>      m_logger;
+  
+//  std::shared_ptr<cnr_logger::TraceLogger>  m_logger;
+  ros::Duration                             m_regulator_time;
+  std::vector<std::string>                  m_controlled_resources;
 };
 
-typedef std::shared_ptr<RegulatorBase> RegulatorBasePtr;
-typedef std::shared_ptr<RegulatorBase const> RegulatorBaseConstPtr;
+typedef std::shared_ptr<BaseRegulator> BaseRegulatorPtr;
+typedef std::shared_ptr<BaseRegulator const> BaseRegulatorConstPtr;
 }
 
 #endif  // CNR_REGULATOR_INTERFACE__CNR_REGULATOR_BASE__H

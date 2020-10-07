@@ -2,12 +2,12 @@
 #define CNR_FAKE_REGULATOR__CNR_FAKE_REGULATOR__H
 
 #include <cnr_interpolator_interface/cnr_interpolator_trajectory.h>
-#include <cnr_regulator_interface/cnr_regulator_base.h>
+#include <cnr_regulator_interface/cnr_regulator_interface.h>
 
 namespace cnr_fake_regulator
 {
 
-class FakeRegulator: public cnr_regulator_interface::RegulatorBase
+class FakeRegulator: public cnr_regulator_interface::BaseJointRegulator
 {
 public:
 
@@ -18,18 +18,14 @@ public:
   FakeRegulator(FakeRegulator&&) = delete;
   FakeRegulator& operator=(FakeRegulator&&) = delete;
 
-  virtual bool initialize(ros::NodeHandle&   root_nh,
-                          ros::NodeHandle&   controller_nh,
-                          cnr_logger::TraceLoggerPtr logger,
-                          cnr_controller_interface::KinematicsStructPtr kin,
-                          cnr_controller_interface::KinematicStatusPtr  state,
-                          const ros::Duration &period);
+  virtual bool initialize(ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh, 
+                          cnr_regulator_interface::BaseRegulatorOptionsConstPtr opts);
 
   bool update(cnr_interpolator_interface::InterpolatorInterfacePtr,
-              cnr_regulator_interface::RegulatorInputBaseConstPtr input,
-              cnr_regulator_interface::RegulatorOutputBasePtr output);
+              cnr_regulator_interface::BaseRegulatorInputConstPtr input,
+              cnr_regulator_interface::BaseRegulatorOutputPtr output);
 
-  virtual bool starting(const ros::Time& time);
+  virtual bool starting(cnr_regulator_interface::BaseRegulatorStatePtr state0, const ros::Time& time);
 
 };
 
