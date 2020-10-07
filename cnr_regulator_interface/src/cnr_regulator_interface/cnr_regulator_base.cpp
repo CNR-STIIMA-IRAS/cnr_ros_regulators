@@ -22,41 +22,50 @@ void get_resource_names(ros::NodeHandle* nh, std::vector<std::string>& names)
   return;
 }
 
-bool RegulatorBase::initialize(ros::NodeHandle&   root_nh,
+bool BaseRegulator::initialize(ros::NodeHandle&   root_nh,
                                ros::NodeHandle&   controller_nh,
-                               cnr_logger::TraceLoggerPtr logger,
-                               cnr_controller_interface::KinematicsStructPtr kin,
-                               cnr_controller_interface::KinematicStatusPtr state,
-                               const ros::Duration &period)
+                               cnr_regulator_interface::BaseRegulatorOptionsConstPtr opts)
 {
-  if(!logger)
+  if(!opts)
   {
-    ROS_ERROR("RegulatorBase::initialize Null pointer to logger! Abort.");
+    ROS_ERROR("BaseRegulator::initialize Null pointer to options! Abort.");
     return false;
   }
-  m_logger = logger;
-  CNR_TRACE_START(*m_logger);
-
-  if(!kin || !state)
+  if(!opts->logger)
   {
-    ROS_ERROR("RegulatorBase::initialize Null pointer to null kinematic! Abort.");
+    ROS_ERROR("BaseRegulator::initialize Null pointer to logger! Abort.");
     return false;
   }
-
-  m_kin = kin;
-  m_kin_state = state;
+  CNR_TRACE_START(opts->logger);
+  
   m_regulator_time = ros::Duration(0);
-  m_period = period;
-
+  
   get_resource_names(&controller_nh, m_controlled_resources);
   if((m_controlled_resources.size()==1)&&(m_controlled_resources.front() == "all"))
   {
     m_controlled_resources.clear();
-    m_controlled_resources = m_kin->jointNames();
+    m_controlled_resources = opts->robot_kin->jointNames();
   }
 
-  CNR_RETURN_TRUE(*m_logger);
+  CNR_RETURN_TRUE(opts->logger);
 }
 
+bool BaseRegulator::starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time)
+{
+  if(!state0)
+  {
+    ROS_ERROR("BaseRegulator::initialize Null pointer to null kinematic! Abort.");
+    return false;
+  }
+  setRegulatorTime(ros::Duration(0.0));
+  return true;
+}
+
+bool BaseRegulator::update(cnr_interpolator_interface::InterpolatorInterfacePtr interpolator,
+                      BaseRegulatorInputConstPtr   input,
+                      BaseRegulatorOutputPtr       output)
+{
+  return true;
+}
 
 }  // namespace cnr_regulator_interface

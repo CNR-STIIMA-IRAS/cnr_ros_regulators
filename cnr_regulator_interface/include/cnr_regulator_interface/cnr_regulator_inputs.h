@@ -12,86 +12,108 @@ namespace cnr_regulator_interface
 
 
 /**
- * @brief The RegulatorInputBase struct
+ * @brief The BaseRegulatorInput struct
  */
-struct RegulatorInputBase
+struct BaseRegulatorInput
 {
-  RegulatorInputBase() = delete;
-  virtual ~RegulatorInputBase() = default;
-  RegulatorInputBase(const RegulatorInputBase&) = delete;
-  RegulatorInputBase& operator=(const RegulatorInputBase&) = delete;
-  RegulatorInputBase(RegulatorInputBase&&) = delete;
-  RegulatorInputBase& operator=(RegulatorInputBase&&) = delete;
+  
+  typedef std::shared_ptr<BaseRegulatorInput> Ptr;
+  typedef const std::shared_ptr<BaseRegulatorInput const> ConstPtr;
+  
+  BaseRegulatorInput() = default;
+  virtual ~BaseRegulatorInput() = default;
+  BaseRegulatorInput(const BaseRegulatorInput&) = delete;
+  BaseRegulatorInput(BaseRegulatorInput&&) = delete;
+  BaseRegulatorInput& operator=(BaseRegulatorInput&&) = delete;
 
-  RegulatorInputBase(size_t n_dof)
-    : dof(n_dof){u.resize(6 + n_dof); u.setZero();}
-  size_t           dof;
+  BaseRegulatorInput(size_t n_dim)
+    : dim(n_dim){u.resize(6 + n_dim); u.setZero();}
+  size_t           dim;
   Eigen::VectorXd  u;
 
+  void set_dimension      (const size_t&   n_dim)                { dim = n_dim; u.resize(6 + n_dim); u.setZero();}
   void set_period         (const ros::Duration& period         ) { u(0) = period.toSec();         }
-  //void set_scaled_time    (const ros::Duration& scaled_time    ) { u(1) = scaled_time.toSec();    }
   void set_target_override(const double& global_override       ) { u(2) = global_override;        }
   void set_time_from_start(const ros::Duration& time_from_start) { u(3) = time_from_start.toSec();}
   void set_goal_tolerance (const double& goal_tolerance        ) { u(4) = goal_tolerance;         }
   void set_path_tolerance (const double& path_tolerance        ) { u(5) = path_tolerance;         }
   void set_u              (const Eigen::VectorXd& input_values )
   {
-    assert(input_values.rows()==dof);
-    u.segment(6,dof)=input_values;
+    assert(input_values.rows()==dim);
+    u.segment(6,dim)=input_values;
   }
 
   ros::Duration   get_period         ( ) const { return ros::Duration(u(0));  }
-  //ros::Duration   get_scaled_time    ( ) const { return ros::Duration(u(1));  }
   double          get_target_override( ) const { return u(2);  }
   ros::Duration   get_time_from_start( ) const { return ros::Duration(u(3));  }
   double          get_goal_tolerance ( ) const { return u(4); }
   double          get_path_tolerance ( ) const { return u(5); }
-  Eigen::VectorXd get_u              ( ) const { return u.segment(6,dof); }
+  Eigen::VectorXd get_u              ( ) const { return u.segment(6,dim); }
+  
+  BaseRegulatorInput& operator=(const BaseRegulatorInput& rhs)
+  {
+    this->dim = rhs.dim;
+    this->u   = rhs.u;
+    return *this;
+  }
+  
 
 };
 
-typedef std::shared_ptr<RegulatorInputBase> RegulatorInputBasePtr;
-typedef const std::shared_ptr<RegulatorInputBase const> RegulatorInputBaseConstPtr;
+typedef BaseRegulatorInput::Ptr BaseRegulatorInputPtr;
+typedef BaseRegulatorInput::ConstPtr BaseRegulatorInputConstPtr;
 
-struct JointRegulatorInput : public cnr_regulator_interface::RegulatorInputBase
+struct JointRegulatorInput : public cnr_regulator_interface::BaseRegulatorInput
 {
-  JointRegulatorInput() = delete;
+  
+  typedef std::shared_ptr<JointRegulatorInput> Ptr;
+  typedef const std::shared_ptr<JointRegulatorInput const> ConstPtr;
+
+  JointRegulatorInput() = default;
   virtual ~JointRegulatorInput() = default;
   JointRegulatorInput(const JointRegulatorInput&) = delete;
-  JointRegulatorInput& operator=(const JointRegulatorInput&) = delete;
   JointRegulatorInput(JointRegulatorInput&&) = delete;
   JointRegulatorInput& operator=(JointRegulatorInput&&) = delete;
 
-  JointRegulatorInput(size_t nAx): RegulatorInputBase( (nAx*4) ){ dof = nAx; }
+  JointRegulatorInput(size_t nAx): BaseRegulatorInput( (nAx*4) ){ dim = nAx; }
 
-  void set_q             (const Eigen::VectorXd& q     ) { u.segment(6+0*dof,dof) = q     ; }
-  void set_qd            (const Eigen::VectorXd& qd    ) { u.segment(6+1*dof,dof) = qd    ; }
-  void set_qdd           (const Eigen::VectorXd& qdd   ) { u.segment(6+2*dof,dof) = qdd   ; }
-  void set_effort        (const Eigen::VectorXd& effort) { u.segment(6+3*dof,dof) = effort; }
+  void set_dof       (const size_t& n_dof          ) { set_dimension(n_dof * 4);                    }
+  void set_q         (const Eigen::VectorXd& q     ) { u.segment(6+0*dim,dim) = q     ; }
+  void set_qd        (const Eigen::VectorXd& qd    ) { u.segment(6+1*dim,dim) = qd    ; }
+  void set_qdd       (const Eigen::VectorXd& qdd   ) { u.segment(6+2*dim,dim) = qdd   ; }
+  void set_effort    (const Eigen::VectorXd& effort) { u.segment(6+3*dim,dim) = effort; }
 
-  Eigen::VectorXd get_q     ( ) const { return u.segment(6+0*dof,dof); }
-  Eigen::VectorXd get_qd    ( ) const { return u.segment(6+1*dof,dof); }
-  Eigen::VectorXd get_qdd   ( ) const { return u.segment(6+2*dof,dof); }
-  Eigen::VectorXd get_effort( ) const { return u.segment(6+3*dof,dof); }
+  Eigen::VectorXd get_q     ( ) const { return u.segment(6+0*dim,dim); }
+  Eigen::VectorXd get_qd    ( ) const { return u.segment(6+1*dim,dim); }
+  Eigen::VectorXd get_qdd   ( ) const { return u.segment(6+2*dim,dim); }
+  Eigen::VectorXd get_effort( ) const { return u.segment(6+3*dim,dim); }
+  
+  JointRegulatorInput& operator=(const JointRegulatorInput& rhs)
+  {
+    this->dim = rhs.dim;
+    this->u   = rhs.u;
+    return *this;
+  }
+
 };
 
-typedef std::shared_ptr<JointRegulatorInput> JointRegulatorInputPtr;
-typedef const std::shared_ptr<JointRegulatorInput const> JointRegulatorInputConstPtr;
+typedef JointRegulatorInput::Ptr JointRegulatorInputPtr;
+typedef JointRegulatorInput::ConstPtr JointRegulatorInputConstPtr;
 
 
 /**
  * @brief The CartesianRegulatorInput struct
  */
-struct CartesianRegulatorInput : public cnr_regulator_interface::RegulatorInputBase
+struct CartesianRegulatorInput : public cnr_regulator_interface::BaseRegulatorInput
 {
+  CartesianRegulatorInput( ): BaseRegulatorInput( (7 + 6 + 6) ){}
+
   virtual ~CartesianRegulatorInput() = default;
   CartesianRegulatorInput(const CartesianRegulatorInput&) = delete;
-  CartesianRegulatorInput& operator=(const CartesianRegulatorInput&) = delete;
   CartesianRegulatorInput(CartesianRegulatorInput&&) = delete;
   CartesianRegulatorInput& operator=(CartesianRegulatorInput&&) = delete;
 
-  CartesianRegulatorInput( ): RegulatorInputBase( (7 + 6 + 6) ){}
-
+  
   void set_x(const Eigen::Affine3d& x)
   {
     Eigen::Quaterniond q(x.linear());
@@ -124,6 +146,15 @@ struct CartesianRegulatorInput : public cnr_regulator_interface::RegulatorInputB
     ret = u.segment(6+13,6);
     return ret;
   }
+  
+  CartesianRegulatorInput& operator=(const CartesianRegulatorInput& rhs)
+  {
+    this->dim = rhs.dim;
+    this->u   = rhs.u;
+    return *this;
+  }
+
+  
 };
 typedef std::shared_ptr<CartesianRegulatorInput> CartesianRegulatorInputPtr;
 typedef const std::shared_ptr<CartesianRegulatorInput const> CartesianRegulatorInputConstPtr;
