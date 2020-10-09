@@ -2,25 +2,25 @@
 #define CNR_IMPEDANCE_REGULATOR__CNR_IMPEDANCE_REGULATOR_OUTPUTS__H
 
 
-#include <cnr_regulator_interface/cnr_regulator_outputs.h>
+#include <cnr_regulator_interface/cnr_regulator_control_commands.h>
 
 namespace cnr_impedance_regulator
 {
 
   
-struct ImpedanceRegulatorOutput : public cnr_regulator_interface::BaseRegulatorOutput
+struct ImpedanceRegulatorControlCommand : public cnr_regulator_interface::BaseRegulatorControlCommand
 {
   size_t nAx;
   
-  ImpedanceRegulatorOutput() = delete;
-  virtual ~ImpedanceRegulatorOutput() = default;
-  ImpedanceRegulatorOutput(const ImpedanceRegulatorOutput&) = delete;
-  ImpedanceRegulatorOutput& operator=(const ImpedanceRegulatorOutput&) = delete;
-  ImpedanceRegulatorOutput(ImpedanceRegulatorOutput&&) = delete;
-  ImpedanceRegulatorOutput& operator=(ImpedanceRegulatorOutput&&) = delete;
+  ImpedanceRegulatorControlCommand() = delete;
+  virtual ~ImpedanceRegulatorControlCommand() = default;
+  ImpedanceRegulatorControlCommand(const ImpedanceRegulatorControlCommand&) = delete;
+  ImpedanceRegulatorControlCommand& operator=(const ImpedanceRegulatorControlCommand&) = delete;
+  ImpedanceRegulatorControlCommand(ImpedanceRegulatorControlCommand&&) = delete;
+  ImpedanceRegulatorControlCommand& operator=(ImpedanceRegulatorControlCommand&&) = delete;
 
-  ImpedanceRegulatorOutput(const size_t& n_ax)
-    : cnr_regulator_interface::BaseRegulatorOutput(4 + n_ax*4)
+  ImpedanceRegulatorControlCommand(const size_t& n_ax)
+    : cnr_regulator_interface::BaseRegulatorControlCommand(4 + n_ax*4)
   {
     nAx = n_ax;
   }
@@ -61,8 +61,8 @@ struct ImpedanceRegulatorOutput : public cnr_regulator_interface::BaseRegulatorO
 };
 
 
-typedef std::shared_ptr<ImpedanceRegulatorOutput> ImpedanceRegulatorOutputPtr;
-typedef const std::shared_ptr<ImpedanceRegulatorOutput const> RegulatorOutputConstPtr;
+typedef std::shared_ptr<ImpedanceRegulatorControlCommand> ImpedanceRegulatorControlCommandPtr;
+typedef std::shared_ptr<ImpedanceRegulatorControlCommand const> RegulatorControlCommandConstPtr;
 
 }  // namespace cnr_impedance_regulator
 

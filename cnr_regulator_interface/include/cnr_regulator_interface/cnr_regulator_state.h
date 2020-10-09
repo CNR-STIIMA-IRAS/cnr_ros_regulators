@@ -21,11 +21,10 @@ struct BaseRegulatorState
   BaseRegulatorState& operator=(const BaseRegulatorState&) = delete;
   BaseRegulatorState(BaseRegulatorState&&) = delete;
   BaseRegulatorState& operator=(BaseRegulatorState&&) = delete;
-
 };
 
 typedef std::shared_ptr<BaseRegulatorState> BaseRegulatorStatePtr;
-typedef const std::shared_ptr<BaseRegulatorState const> BaseRegulatorStateConstPtr;
+typedef std::shared_ptr<BaseRegulatorState const> BaseRegulatorStateConstPtr;
 
 class JointRegulatorState : public cnr_regulator_interface::BaseRegulatorState
 {
@@ -34,7 +33,7 @@ protected:
   
 public:
   typedef std::shared_ptr<JointRegulatorState> Ptr;
-  typedef const std::shared_ptr<JointRegulatorState const> ConstPtr;
+  typedef std::shared_ptr<JointRegulatorState const> ConstPtr;
 
   JointRegulatorState() = default;
   virtual ~JointRegulatorState() = default;
@@ -51,33 +50,33 @@ public:
   {
     setRobotState(status);
   }
-  
-  cnr_controller_interface::KinematicStatusConstPtr getRobotState() const
-  {
+
+  cnr_controller_interface::KinematicStatusPtr getRobotState() 
+  { 
     return robot_state;
   }
+
+  cnr_controller_interface::KinematicStatusConstPtr getRobotState() const 
+  { 
+    return robot_state; 
+   }
   
-  JointRegulatorState& setRobotState(const cnr_controller_interface::KinematicStatus& status)
+  virtual void setRobotState(const cnr_controller_interface::KinematicStatus& status)
   {
     if(!robot_state)
     {
       robot_state.reset(new cnr_controller_interface::KinematicStatus(status.getKin()));
     }
     *robot_state = status;
-    
-    return *this;
   }
   
-  JointRegulatorState& setRobotState(cnr_controller_interface::KinematicStatusConstPtr& status)
+  virtual void setRobotState(cnr_controller_interface::KinematicStatusConstPtr& status)
   {
     if(!robot_state)
     {
       robot_state.reset(new cnr_controller_interface::KinematicStatus(status->getKin()));
     }
-
     *robot_state = *status;
-    
-    return *this;
   }
 };
 
@@ -93,7 +92,7 @@ struct CartesianRegulatorState : public cnr_regulator_interface::JointRegulatorS
   
 public:
   typedef std::shared_ptr<CartesianRegulatorState> Ptr;
-  typedef const std::shared_ptr<CartesianRegulatorState const> ConstPtr;
+  typedef std::shared_ptr<CartesianRegulatorState const> ConstPtr;
   
   virtual ~CartesianRegulatorState() = default;
   CartesianRegulatorState(const CartesianRegulatorState&) = delete;
@@ -109,11 +108,16 @@ public:
   {
   }
   
-  CartesianRegulatorState& setRobotState(const cnr_controller_interface::KinematicStatus& state) 
+  virtual void setRobotState(const cnr_controller_interface::KinematicStatus& status)
   {
-    *robot_state = state;
+    JointRegulatorState::setRobotState(status);
     robot_state->updateTransformation();
-    return *this;
+  }
+  
+  virtual void setRobotState(cnr_controller_interface::KinematicStatusConstPtr& status) override
+  {
+    JointRegulatorState::setRobotState(status);
+    robot_state->updateTransformation();
   }
   
 

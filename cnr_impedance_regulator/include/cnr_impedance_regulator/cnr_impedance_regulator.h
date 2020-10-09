@@ -15,10 +15,12 @@
 namespace cnr_impedance_regulator
 {
 
-typedef cnr_regulator_interface::RegulatorInterface<ImpedanceRegulatorOptions, 
+typedef cnr_regulator_interface::RegulatorInterface<ImpedanceRegulatorParams, 
                                                     ImpedanceRegulatorState,
-                                                    ImpedanceRegulatorInput,
-                                                    ImpedanceRegulatorOutput> BaseImpedanceRegulator;
+                                                    ImpedanceRegulatorReference,
+                                                    ImpedanceRegulatorControlCommand,
+                                                    cnr_regulator_interface::JointRegulatorFeedback
+                                                    > BaseImpedanceRegulator;
  
 class ImpedanceRegulator: public BaseImpedanceRegulator
 {
@@ -33,13 +35,12 @@ public:
 
   virtual bool initialize(ros::NodeHandle&   root_nh,
                           ros::NodeHandle&   controller_nh,
-                          cnr_regulator_interface::BaseRegulatorOptionsConstPtr opts);
+                          cnr_regulator_interface::BaseRegulatorParamsPtr opts) override;
 
-  bool update(cnr_interpolator_interface::InterpolatorInterfacePtr,
-              cnr_regulator_interface::BaseRegulatorInputConstPtr input,
-              cnr_regulator_interface::BaseRegulatorOutputPtr output);
+  bool update(cnr_regulator_interface::BaseRegulatorReferenceConstPtr r,
+              cnr_regulator_interface::BaseRegulatorControlCommandPtr u) override;
 
-  virtual bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time);
+  virtual bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time) override;
   
 private:
   
@@ -54,7 +55,7 @@ private:
 
 
 typedef std::shared_ptr<ImpedanceRegulator> ImpedanceRegulatorPtr;
-typedef const std::shared_ptr<ImpedanceRegulator const > ImpedanceRegulatorConstPtr;
+typedef std::shared_ptr<ImpedanceRegulator const > ImpedanceRegulatorConstPtr;
 
 
 

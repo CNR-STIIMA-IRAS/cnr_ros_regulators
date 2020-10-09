@@ -1,4 +1,4 @@
-#include <cnr_regulator_interface/cnr_regulator_base.h>
+#include <cnr_regulator_interface/internal/cnr_regulator_base.h>
 namespace cnr_regulator_interface
 {
 
@@ -24,30 +24,31 @@ void get_resource_names(ros::NodeHandle* nh, std::vector<std::string>& names)
 
 bool BaseRegulator::initialize(ros::NodeHandle&   root_nh,
                                ros::NodeHandle&   controller_nh,
-                               cnr_regulator_interface::BaseRegulatorOptionsConstPtr opts)
+                               cnr_regulator_interface::BaseRegulatorParamsPtr params)
 {
-  if(!opts)
+  if(!params)
   {
     ROS_ERROR("BaseRegulator::initialize Null pointer to options! Abort.");
     return false;
   }
-  if(!opts->logger)
+  if(!params->logger)
   {
     ROS_ERROR("BaseRegulator::initialize Null pointer to logger! Abort.");
     return false;
   }
-  CNR_TRACE_START(opts->logger);
+  p_ = params;
+  CNR_TRACE_START(params->logger);
   
-  m_regulator_time = ros::Duration(0);
+  regulator_time_ = ros::Duration(0);
   
-  get_resource_names(&controller_nh, m_controlled_resources);
-  if((m_controlled_resources.size()==1)&&(m_controlled_resources.front() == "all"))
+  get_resource_names(&controller_nh, controlled_resources_);
+  if((controlled_resources_.size()==1)&&(controlled_resources_.front() == "all"))
   {
-    m_controlled_resources.clear();
-    m_controlled_resources = opts->robot_kin->jointNames();
+    controlled_resources_.clear();
+    controlled_resources_ = params->robot_kin->jointNames();
   }
 
-  CNR_RETURN_TRUE(opts->logger);
+  CNR_RETURN_TRUE(p_->logger);
 }
 
 bool BaseRegulator::starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time)
@@ -58,13 +59,43 @@ bool BaseRegulator::starting(cnr_regulator_interface::BaseRegulatorStateConstPtr
     return false;
   }
   setRegulatorTime(ros::Duration(0.0));
+  x0_ = state0;
   return true;
 }
 
-bool BaseRegulator::update(cnr_interpolator_interface::InterpolatorInterfacePtr interpolator,
-                      BaseRegulatorInputConstPtr   input,
-                      BaseRegulatorOutputPtr       output)
+bool BaseRegulator::update( BaseRegulatorReferenceConstPtr   r,
+                            BaseRegulatorFeedbackConstPtr    y,
+                            BaseRegulatorControlCommandPtr   u)
 {
+  r_ = r;
+  y_ = y;
+  u_ = u;
+  return true;
+}
+
+bool BaseRegulator::update( BaseRegulatorReferenceConstPtr   r,
+                            BaseRegulatorControlCommandPtr   u)
+{
+  r_ = r;
+  y_.reset();
+  u_ = u;
+  return true;
+}
+
+bool BaseRegulator::update( BaseRegulatorFeedbackConstPtr    y,
+                            BaseRegulatorControlCommandPtr   u)
+{
+  r_.reset();
+  y_ = y;
+  u_ = u;
+  return true;
+}
+
+bool BaseRegulator::update( BaseRegulatorControlCommandPtr   u)
+{
+  r_.reset();
+  y_.reset();
+  u_ = u;
   return true;
 }
 

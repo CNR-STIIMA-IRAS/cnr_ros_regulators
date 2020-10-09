@@ -12,21 +12,21 @@ namespace cnr_regulator_interface
 
 
 /**
- * @brief The BaseRegulatorInput struct
+ * @brief The BaseRegulatorReference struct
  */
-struct BaseRegulatorInput
+struct BaseRegulatorReference
 {
   
-  typedef std::shared_ptr<BaseRegulatorInput> Ptr;
-  typedef const std::shared_ptr<BaseRegulatorInput const> ConstPtr;
+  typedef std::shared_ptr<BaseRegulatorReference> Ptr;
+  typedef std::shared_ptr<BaseRegulatorReference const> ConstPtr;
   
-  BaseRegulatorInput() = default;
-  virtual ~BaseRegulatorInput() = default;
-  BaseRegulatorInput(const BaseRegulatorInput&) = delete;
-  BaseRegulatorInput(BaseRegulatorInput&&) = delete;
-  BaseRegulatorInput& operator=(BaseRegulatorInput&&) = delete;
+  BaseRegulatorReference() = default;
+  virtual ~BaseRegulatorReference() = default;
+  BaseRegulatorReference(const BaseRegulatorReference&) = delete;
+  BaseRegulatorReference(BaseRegulatorReference&&) = delete;
+  BaseRegulatorReference& operator=(BaseRegulatorReference&&) = delete;
 
-  BaseRegulatorInput(size_t n_dim)
+  BaseRegulatorReference(size_t n_dim)
     : dim(n_dim){u.resize(6 + n_dim); u.setZero();}
   size_t           dim;
   Eigen::VectorXd  u;
@@ -50,7 +50,7 @@ struct BaseRegulatorInput
   double          get_path_tolerance ( ) const { return u(5); }
   Eigen::VectorXd get_u              ( ) const { return u.segment(6,dim); }
   
-  BaseRegulatorInput& operator=(const BaseRegulatorInput& rhs)
+  BaseRegulatorReference& operator=(const BaseRegulatorReference& rhs)
   {
     this->dim = rhs.dim;
     this->u   = rhs.u;
@@ -60,22 +60,22 @@ struct BaseRegulatorInput
 
 };
 
-typedef BaseRegulatorInput::Ptr BaseRegulatorInputPtr;
-typedef BaseRegulatorInput::ConstPtr BaseRegulatorInputConstPtr;
+typedef BaseRegulatorReference::Ptr BaseRegulatorReferencePtr;
+typedef BaseRegulatorReference::ConstPtr BaseRegulatorReferenceConstPtr;
 
-struct JointRegulatorInput : public cnr_regulator_interface::BaseRegulatorInput
+struct JointRegulatorReference : public cnr_regulator_interface::BaseRegulatorReference
 {
   
-  typedef std::shared_ptr<JointRegulatorInput> Ptr;
-  typedef const std::shared_ptr<JointRegulatorInput const> ConstPtr;
+  typedef std::shared_ptr<JointRegulatorReference> Ptr;
+  typedef std::shared_ptr<JointRegulatorReference const> ConstPtr;
 
-  JointRegulatorInput() = default;
-  virtual ~JointRegulatorInput() = default;
-  JointRegulatorInput(const JointRegulatorInput&) = delete;
-  JointRegulatorInput(JointRegulatorInput&&) = delete;
-  JointRegulatorInput& operator=(JointRegulatorInput&&) = delete;
+  JointRegulatorReference() = default;
+  virtual ~JointRegulatorReference() = default;
+  JointRegulatorReference(const JointRegulatorReference&) = delete;
+  JointRegulatorReference(JointRegulatorReference&&) = delete;
+  JointRegulatorReference& operator=(JointRegulatorReference&&) = delete;
 
-  JointRegulatorInput(size_t nAx): BaseRegulatorInput( (nAx*4) ){ dim = nAx; }
+  JointRegulatorReference(size_t nAx): BaseRegulatorReference( (nAx*4) ){ dim = nAx; }
 
   void set_dof       (const size_t& n_dof          ) { set_dimension(n_dof * 4);                    }
   void set_q         (const Eigen::VectorXd& q     ) { u.segment(6+0*dim,dim) = q     ; }
@@ -88,7 +88,7 @@ struct JointRegulatorInput : public cnr_regulator_interface::BaseRegulatorInput
   Eigen::VectorXd get_qdd   ( ) const { return u.segment(6+2*dim,dim); }
   Eigen::VectorXd get_effort( ) const { return u.segment(6+3*dim,dim); }
   
-  JointRegulatorInput& operator=(const JointRegulatorInput& rhs)
+  JointRegulatorReference& operator=(const JointRegulatorReference& rhs)
   {
     this->dim = rhs.dim;
     this->u   = rhs.u;
@@ -97,21 +97,21 @@ struct JointRegulatorInput : public cnr_regulator_interface::BaseRegulatorInput
 
 };
 
-typedef JointRegulatorInput::Ptr JointRegulatorInputPtr;
-typedef JointRegulatorInput::ConstPtr JointRegulatorInputConstPtr;
+typedef JointRegulatorReference::Ptr JointRegulatorReferencePtr;
+typedef JointRegulatorReference::ConstPtr JointRegulatorReferenceConstPtr;
 
 
 /**
- * @brief The CartesianRegulatorInput struct
+ * @brief The CartesianRegulatorReference struct
  */
-struct CartesianRegulatorInput : public cnr_regulator_interface::BaseRegulatorInput
+struct CartesianRegulatorReference : public cnr_regulator_interface::BaseRegulatorReference
 {
-  CartesianRegulatorInput( ): BaseRegulatorInput( (7 + 6 + 6) ){}
+  CartesianRegulatorReference( ): BaseRegulatorReference( (7 + 6 + 6) ){}
 
-  virtual ~CartesianRegulatorInput() = default;
-  CartesianRegulatorInput(const CartesianRegulatorInput&) = delete;
-  CartesianRegulatorInput(CartesianRegulatorInput&&) = delete;
-  CartesianRegulatorInput& operator=(CartesianRegulatorInput&&) = delete;
+  virtual ~CartesianRegulatorReference() = default;
+  CartesianRegulatorReference(const CartesianRegulatorReference&) = delete;
+  CartesianRegulatorReference(CartesianRegulatorReference&&) = delete;
+  CartesianRegulatorReference& operator=(CartesianRegulatorReference&&) = delete;
 
   
   void set_x(const Eigen::Affine3d& x)
@@ -147,7 +147,7 @@ struct CartesianRegulatorInput : public cnr_regulator_interface::BaseRegulatorIn
     return ret;
   }
   
-  CartesianRegulatorInput& operator=(const CartesianRegulatorInput& rhs)
+  CartesianRegulatorReference& operator=(const CartesianRegulatorReference& rhs)
   {
     this->dim = rhs.dim;
     this->u   = rhs.u;
@@ -156,8 +156,8 @@ struct CartesianRegulatorInput : public cnr_regulator_interface::BaseRegulatorIn
 
   
 };
-typedef std::shared_ptr<CartesianRegulatorInput> CartesianRegulatorInputPtr;
-typedef const std::shared_ptr<CartesianRegulatorInput const> CartesianRegulatorInputConstPtr;
+typedef std::shared_ptr<CartesianRegulatorReference> CartesianRegulatorReferencePtr;
+typedef std::shared_ptr<CartesianRegulatorReference const> CartesianRegulatorReferenceConstPtr;
 
 
 }  // namespace cnr_regulator_interface

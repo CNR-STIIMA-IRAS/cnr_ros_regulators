@@ -14,7 +14,7 @@ namespace cnr_impedance_regulator
 struct ImpedanceRegulatorState : public cnr_regulator_interface::JointRegulatorState
 {
   typedef std::shared_ptr<ImpedanceRegulatorState> Ptr;
-  typedef const std::shared_ptr<ImpedanceRegulatorState const> ConstPtr;
+  typedef std::shared_ptr<ImpedanceRegulatorState const> ConstPtr;
   
   ImpedanceRegulatorState() = default;
   virtual ~ImpedanceRegulatorState() = default;

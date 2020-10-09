@@ -10,18 +10,18 @@ namespace cnr_regulator_interface
 
 
 /**
- * @brief The BaseRegulatorOutput struct
+ * @brief The BaseRegulatorControlCommand struct
  */
-struct BaseRegulatorOutput
+struct BaseRegulatorControlCommand
 {
-  BaseRegulatorOutput() = delete;
-  virtual ~BaseRegulatorOutput() = default;
-  BaseRegulatorOutput(const BaseRegulatorOutput&) = delete;
-  BaseRegulatorOutput& operator=(const BaseRegulatorOutput&) = delete;
-  BaseRegulatorOutput(BaseRegulatorOutput&&) = delete;
-  BaseRegulatorOutput& operator=(BaseRegulatorOutput&&) = delete;
+  BaseRegulatorControlCommand() = delete;
+  virtual ~BaseRegulatorControlCommand() = default;
+  BaseRegulatorControlCommand(const BaseRegulatorControlCommand&) = delete;
+  BaseRegulatorControlCommand& operator=(const BaseRegulatorControlCommand&) = delete;
+  BaseRegulatorControlCommand(BaseRegulatorControlCommand&&) = delete;
+  BaseRegulatorControlCommand& operator=(BaseRegulatorControlCommand&&) = delete;
 
-  BaseRegulatorOutput(const size_t& sz) : dim(sz)
+  BaseRegulatorControlCommand(const size_t& sz) : dim(sz)
   {
     u.resize(dim);
     u.setZero();
@@ -33,23 +33,23 @@ struct BaseRegulatorOutput
   Eigen::VectorXd u;
 };
 
-typedef std::shared_ptr<BaseRegulatorOutput> BaseRegulatorOutputPtr;
-typedef const std::shared_ptr<BaseRegulatorOutput const > BaseRegulatorOutputConstPtr;
+typedef std::shared_ptr<BaseRegulatorControlCommand> BaseRegulatorControlCommandPtr;
+typedef std::shared_ptr<BaseRegulatorControlCommand const > BaseRegulatorControlCommandConstPtr;
 
 /**
- * @brief The BaseRegulatorOutput struct
+ * @brief The BaseRegulatorControlCommand struct
  */
-struct JointRegulatorOutput : public BaseRegulatorOutput
+struct JointRegulatorControlCommand : public BaseRegulatorControlCommand
 {
-  JointRegulatorOutput() = delete;
-  virtual ~JointRegulatorOutput() = default;
-  JointRegulatorOutput(const JointRegulatorOutput&) = delete;
-  JointRegulatorOutput& operator=(const JointRegulatorOutput&) = delete;
-  JointRegulatorOutput(JointRegulatorOutput&&) = delete;
-  JointRegulatorOutput& operator=(JointRegulatorOutput&&) = delete;
+  JointRegulatorControlCommand() = delete;
+  virtual ~JointRegulatorControlCommand() = default;
+  JointRegulatorControlCommand(const JointRegulatorControlCommand&) = delete;
+  JointRegulatorControlCommand& operator=(const JointRegulatorControlCommand&) = delete;
+  JointRegulatorControlCommand(JointRegulatorControlCommand&&) = delete;
+  JointRegulatorControlCommand& operator=(JointRegulatorControlCommand&&) = delete;
 
-  JointRegulatorOutput(const size_t& nAx)
-    : BaseRegulatorOutput(4 + nAx*4)
+  JointRegulatorControlCommand(const size_t& nAx)
+    : BaseRegulatorControlCommand(4 + nAx*4)
   {
     dim = nAx;
   }
@@ -89,26 +89,26 @@ struct JointRegulatorOutput : public BaseRegulatorOutput
   virtual Eigen::VectorXd get_effort           ( ) const { return u.segment(3*dim+4,dim); }
 };
 
-typedef std::shared_ptr<JointRegulatorOutput> JointRegulatorOutputPtr;
-typedef const std::shared_ptr<JointRegulatorOutput const> JointRegulatorOutputConstPtr;
+typedef std::shared_ptr<JointRegulatorControlCommand> JointRegulatorControlCommandPtr;
+typedef std::shared_ptr<JointRegulatorControlCommand const> JointRegulatorControlCommandConstPtr;
 
 /**
- * @brief The CartesianRegulatorOutput struct
+ * @brief The CartesianRegulatorControlCommand struct
  */
-struct CartesianRegulatorOutput : public cnr_regulator_interface::JointRegulatorOutput
+struct CartesianRegulatorControlCommand : public cnr_regulator_interface::JointRegulatorControlCommand
 {
-  CartesianRegulatorOutput(const size_t ndim = 6)
-    : JointRegulatorOutput(ndim)
+  CartesianRegulatorControlCommand(const size_t ndim = 6)
+    : JointRegulatorControlCommand(ndim)
   {
   }
-  virtual ~CartesianRegulatorOutput() = default;
-  CartesianRegulatorOutput(const CartesianRegulatorOutput&) = delete;
-  CartesianRegulatorOutput& operator=(const CartesianRegulatorOutput&) = delete;
-  CartesianRegulatorOutput(CartesianRegulatorOutput&&) = delete;
-  CartesianRegulatorOutput& operator=(CartesianRegulatorOutput&&) = delete;
+  virtual ~CartesianRegulatorControlCommand() = default;
+  CartesianRegulatorControlCommand(const CartesianRegulatorControlCommand&) = delete;
+  CartesianRegulatorControlCommand& operator=(const CartesianRegulatorControlCommand&) = delete;
+  CartesianRegulatorControlCommand(CartesianRegulatorControlCommand&&) = delete;
+  CartesianRegulatorControlCommand& operator=(CartesianRegulatorControlCommand&&) = delete;
 };
-typedef std::shared_ptr<CartesianRegulatorOutput> CartesianRegulatorOutputPtr;
-typedef const std::shared_ptr<CartesianRegulatorOutput const> CartesianRegulatorOutputConstPtr;
+typedef std::shared_ptr<CartesianRegulatorControlCommand> CartesianRegulatorControlCommandPtr;
+typedef std::shared_ptr<CartesianRegulatorControlCommand const> CartesianRegulatorControlCommandConstPtr;
 
 
 }  // namespace cnr_regulator_interface

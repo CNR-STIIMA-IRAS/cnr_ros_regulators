@@ -65,14 +65,14 @@ inline std::string to_string( const bool& val )
 namespace cnr_impedance_regulator
 {
 
-using cnr_impedance_regulator::ImpedanceRegulatorInput;
-using cnr_impedance_regulator::ImpedanceRegulatorInputConstPtr;
-using cnr_impedance_regulator::ImpedanceRegulatorOutput;
-using cnr_impedance_regulator::ImpedanceRegulatorOutputPtr;
+using cnr_impedance_regulator::ImpedanceRegulatorReference;
+using cnr_impedance_regulator::ImpedanceRegulatorReferenceConstPtr;
+using cnr_impedance_regulator::ImpedanceRegulatorControlCommand;
+using cnr_impedance_regulator::ImpedanceRegulatorControlCommandPtr;
 
 bool ImpedanceRegulator::initialize(ros::NodeHandle&  root_nh,
                                     ros::NodeHandle&  controller_nh,
-                                    cnr_regulator_interface::BaseRegulatorOptionsConstPtr opts)
+                                    cnr_regulator_interface::BaseRegulatorParamsPtr opts)
 {
   if(!BaseImpedanceRegulator::initialize(root_nh,controller_nh,opts))
   {
@@ -81,25 +81,25 @@ bool ImpedanceRegulator::initialize(ros::NodeHandle&  root_nh,
   
   try
   {     
-    m_Jinv.resize(m_opts.dim);
-    m_damping.resize(m_opts.dim);
-    m_damping_dafault.resize(m_opts.dim);
-    m_k.resize(m_opts.dim);
-    m_k_default.resize(m_opts.dim);
-    m_k_new.resize(m_opts.dim);
+    m_Jinv.resize(dim());
+    m_damping.resize(dim());
+    m_damping_dafault.resize(dim());
+    m_k.resize(dim());
+    m_k_default.resize(dim());
+    m_k_new.resize(dim());
 
     
-    std::vector<double> inertia(m_opts.dim,0), damping(m_opts.dim,0), stiffness(m_opts.dim,0), eff_deadband(m_opts.dim,0);
-    GET_PARAM_VECTOR_AND_RETURN(controller_nh, "inertia"  , inertia  , m_opts.dim);
-    GET_PARAM_VECTOR_AND_RETURN(controller_nh, "stiffness", stiffness, m_opts.dim);
+    std::vector<double> inertia(dim(),0), damping(dim(),0), stiffness(dim(),0), eff_deadband(dim(),0);
+    GET_PARAM_VECTOR_AND_RETURN(controller_nh, "inertia"  , inertia  , dim());
+    GET_PARAM_VECTOR_AND_RETURN(controller_nh, "stiffness", stiffness, dim());
 
     if (controller_nh.hasParam("damping_ratio"))
     {
       std::vector<double> damping_ratio;
-      GET_PARAM_VECTOR_AND_RETURN(controller_nh,  "damping_ratio", damping_ratio, m_opts.dim);
+      GET_PARAM_VECTOR_AND_RETURN(controller_nh,  "damping_ratio", damping_ratio, dim());
 
-      damping.resize(m_opts.dim,0);
-      for (unsigned int iAx=0; iAx<m_opts.dim; iAx++)
+      damping.resize(dim(),0);
+      for (unsigned int iAx=0; iAx<dim(); iAx++)
       {
         if (stiffness.at(iAx)<=0)
         {
@@ -111,11 +111,11 @@ bool ImpedanceRegulator::initialize(ros::NodeHandle&  root_nh,
     }
     else
     {
-      GET_PARAM_VECTOR_AND_RETURN(controller_nh, "damping", damping, m_opts.dim);
+      GET_PARAM_VECTOR_AND_RETURN(controller_nh, "damping", damping, dim());
     }
 
     
-    for (unsigned int iAx=0;iAx<m_opts.dim;iAx++)
+    for (unsigned int iAx=0;iAx<dim();iAx++)
     {
       if (inertia.at(iAx)<=0)
       {
@@ -153,49 +153,43 @@ bool ImpedanceRegulator::initialize(ros::NodeHandle&  root_nh,
   }
   catch(const  std::exception& e)
   {
-    CNR_ERROR(m_logger, "EXCEPTION: " << e.what());
-    CNR_RETURN_FALSE(m_logger);
+    CNR_ERROR(logger(), "EXCEPTION: " << e.what());
+    CNR_RETURN_FALSE(logger());
   }
-  CNR_RETURN_TRUE(m_logger);
+  CNR_RETURN_TRUE(logger());
 }
 
 bool ImpedanceRegulator::starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time)
 {
   if(!BaseImpedanceRegulator::starting(state0, time))
   {
-    CNR_RETURN_FALSE(m_logger);
+    CNR_RETURN_FALSE(logger());
   }
-  cnr_impedance_regulator::ImpedanceRegulatorStateConstPtr  x0 = 
-                      std::dynamic_pointer_cast< cnr_impedance_regulator::ImpedanceRegulatorState const>(state0);
-  m_state0->setRobotState(x0->getRobotState());
-  m_state ->setRobotState(x0->getRobotState());
-  
-  CNR_RETURN_TRUE(m_logger);
+  x()->setRobotState(kin());
+  CNR_RETURN_TRUE(logger());
 }
 
 
-bool ImpedanceRegulator::update(cnr_interpolator_interface::InterpolatorInterfacePtr interpolator,
-                                cnr_regulator_interface::BaseRegulatorInputConstPtr  input,
-                                cnr_regulator_interface::BaseRegulatorOutputPtr      output)
+bool ImpedanceRegulator::update(cnr_regulator_interface::BaseRegulatorReferenceConstPtr _r,
+                                cnr_regulator_interface::BaseRegulatorControlCommandPtr _u)
 {
-  if(!BaseImpedanceRegulator::update(interpolator, input, output))
+  if(!BaseImpedanceRegulator::update(_r, _u))
   {
-    CNR_RETURN_FALSE(m_logger);
+    CNR_RETURN_FALSE(logger());
   }
     
-  m_state->model->xdd = m_Jinv.cwiseProduct( m_k.cwiseProduct(m_input.get_x() - m_state->model->x) 
-                     + m_damping.cwiseProduct(m_input.get_xd()  - m_state->model->xd) + m_input.get_effort( ));
-  m_state->model->x  += m_state->model->xd  * m_period.toSec() + m_state->model->xdd*std::pow(m_period.toSec(),2.0)*0.5;
-  m_state->model->xd += m_state->model->xdd * m_period.toSec();
+  x()->model->xdd = m_Jinv.cwiseProduct( m_k.cwiseProduct(r()->get_x() - x()->model->x) 
+                     + m_damping.cwiseProduct(r()->get_xd() - x()->model->xd) + r()->get_effort( ));
+  x()->model->x  += x()->model->xd  * period().toSec() + x()->model->xdd*std::pow(period().toSec(),2.0)*0.5;
+  x()->model->xd += x()->model->xdd * period().toSec();
   
-  m_regulator_time  += m_period;
+  regulator_time_  += period();
 
-  m_output->set_x(m_state->model->x);
-  m_output->set_xd(m_state->model->xd);
-  m_output->set_xdd(m_state->model->xdd);
-  m_output->set_time_from_start(m_regulator_time);
+  u()->set_x(x()->model->x);
+  u()->set_xd(x()->model->xd);
+  u()->set_xdd(x()->model->xdd);
+  u()->set_time_from_start(regulator_time_);
 
-  //CNR_INFO_THROTTLE(*m_logger, 5, "interpolator output velocities: " << j_out->get_qd().transpose() );
   return true;
 }
 

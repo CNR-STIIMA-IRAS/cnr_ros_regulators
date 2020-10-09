@@ -43,13 +43,13 @@
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
 #include <cnr_interpolator_interface/cnr_interpolator_interface.h>
-#include <cnr_regulator_interface/cnr_regulator_base.h>
+#include <cnr_regulator_interface/internal/cnr_regulator_base.h>
 
 namespace cnr_regulator_interface
 {
 
 
-template< class OPTS, class STATE, class INPUT, class OUTPUT>
+template< class P, class X, class R, class U, class Y>
 class RegulatorInterface : public cnr_regulator_interface::BaseRegulator
 {
 public:
@@ -63,107 +63,227 @@ public:
 
   virtual bool initialize(ros::NodeHandle&  root_nh, 
                           ros::NodeHandle& controller_nh, 
-                          cnr_regulator_interface::BaseRegulatorOptionsConstPtr opts)
+                          cnr_regulator_interface::BaseRegulatorParamsPtr opts) override
   {
     if(!cnr_regulator_interface::BaseRegulator::initialize(root_nh,controller_nh, opts))
     {
       return false;
     }
     
-    CNR_TRACE_START(opts->logger);
-    const std::shared_ptr<OPTS const > _opts = std::dynamic_pointer_cast<OPTS const>(opts);
-    if(!opts)
+    CNR_TRACE_START(logger());
+    const std::shared_ptr<P> _p = std::dynamic_pointer_cast<P>(opts);
+    if(!_p)
     {
-      CNR_RETURN_TRUE(opts->logger, "Recast failure. Check the objects type. Abort.");
+      CNR_RETURN_TRUE(logger(), "Recast failure. Check the objects type. Abort.");
     }
-    this->m_opts << opts;
     
-    CNR_RETURN_TRUE(opts->logger);
+    CNR_RETURN_TRUE(logger());
   }
 
-  virtual bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, 
-                        const ros::Time& time)
+  virtual bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr x0, 
+                        const ros::Time& time) override
   {
-    CNR_TRACE_START(this->m_opts.logger);
-    if(!cnr_regulator_interface::BaseRegulator::starting(state0, time))
+    CNR_TRACE_START(logger());
+    std::shared_ptr<X const> _x0 = std::dynamic_pointer_cast<X const>(x0);
+    if(!_x0)
     {
-      CNR_RETURN_FALSE(this->m_opts.logger);
+      CNR_RETURN_FALSE(logger(), "Recast failure. Check the objects type. Abort.");
     }
-    const std::shared_ptr<STATE const> st0 = std::dynamic_pointer_cast<STATE const>(state0);
-    if(!st0)
-    {
-      CNR_RETURN_FALSE(this->m_opts.logger, "Recast failure. Check the objects type. Abort.");
-    }
-    this->m_state0.reset( new STATE( ) );
-    this->m_state0->setRobotState(*st0->getRobotState());
     
-    this->m_state.reset( new STATE( ) );
-    this->m_state->setRobotState(*st0->getRobotState());
-    CNR_RETURN_TRUE(this->m_opts.logger);
+    if(!cnr_regulator_interface::BaseRegulator::starting(_x0, time))
+    {
+      CNR_RETURN_FALSE(logger());
+    }
+    std::shared_ptr<X> x( new X( ) );
+    this->x_ = x;
+    CNR_RETURN_TRUE(logger());
   }
 
-  virtual bool update(cnr_interpolator_interface::InterpolatorInterfacePtr  interpolator,
-                      cnr_regulator_interface::BaseRegulatorInputConstPtr   input,
-                      cnr_regulator_interface::BaseRegulatorOutputPtr       output)
+  virtual bool update(cnr_regulator_interface::BaseRegulatorReferenceConstPtr   r,
+                      cnr_regulator_interface::BaseRegulatorFeedbackConstPtr    y,
+                      cnr_regulator_interface::BaseRegulatorControlCommandPtr   u) override
   {
-    CNR_TRACE_START_THROTTLE_DEFAULT(this->m_opts.logger);
+    CNR_TRACE_START_THROTTLE_DEFAULT(logger());
+    auto _r = get(r);
+    auto _y = get(y);
+    auto _u = get(u);
+    if(!_r || !_y || !_u )
+    {
+      CNR_RETURN_FALSE(logger());
+    }
+    if(!cnr_regulator_interface::BaseRegulator::update(_r,_y,_u))
+    {
+      CNR_RETURN_FALSE(logger());
+    }
+    CNR_RETURN_TRUE_THROTTLE_DEFAULT(logger());
+  }
 
-    if(!cnr_regulator_interface::BaseRegulator::update(interpolator, input, output))
+  virtual bool update(cnr_regulator_interface::BaseRegulatorReferenceConstPtr   r,
+                      cnr_regulator_interface::BaseRegulatorControlCommandPtr   u) override
+  {
+    CNR_TRACE_START_THROTTLE_DEFAULT(logger());
+    auto _r = get(r);
+    auto _u = get(u);
+    if(!_r || !_u )
     {
-      CNR_RETURN_FALSE(this->m_opts.logger);
+      CNR_RETURN_FALSE(logger());
     }
-    const std::shared_ptr<INPUT const > in = std::dynamic_pointer_cast<INPUT const>(input);
-    if(!in)
+    if(!cnr_regulator_interface::BaseRegulator::update(_r,_u))
     {
-      CNR_RETURN_FALSE(this->m_opts.logger, "Recast failure. Check the objects type. Abort.");
+      CNR_RETURN_FALSE(logger());
     }
-    m_input = *in;
-    
-    std::shared_ptr<OUTPUT> out = std::dynamic_pointer_cast<OUTPUT>(output);
-    if(!out)
-    {
-      CNR_RETURN_FALSE(this->m_opts.logger, "Recast failure. Check the objects type. Abort.");
-    }
-    m_output = out;
+    CNR_RETURN_TRUE_THROTTLE_DEFAULT(logger());
+  }
 
-    CNR_RETURN_TRUE_THROTTLE_DEFAULT(this->m_opts.logger);
+  virtual bool update(cnr_regulator_interface::BaseRegulatorFeedbackConstPtr   y,
+                      cnr_regulator_interface::BaseRegulatorControlCommandPtr  u) override
+  {
+    CNR_TRACE_START_THROTTLE_DEFAULT(logger());
+    auto _y = get(y);
+    auto _u = get(u);
+    if(!_y || !_u )
+    {
+      CNR_RETURN_FALSE(logger());
+    }
+    if(!cnr_regulator_interface::BaseRegulator::update(_y,_u))
+    {
+      CNR_RETURN_FALSE(logger());
+    }
+    CNR_RETURN_TRUE_THROTTLE_DEFAULT(logger());
+  }
+
+  virtual bool update(cnr_regulator_interface::BaseRegulatorControlCommandPtr  u) override
+  {
+    CNR_TRACE_START_THROTTLE_DEFAULT(logger());
+    auto _u = get(u);
+    if(!_u )
+    {
+      CNR_RETURN_FALSE(logger());
+    }
+    if(!cnr_regulator_interface::BaseRegulator::update(_u))
+    {
+      CNR_RETURN_FALSE(logger());
+    }
+    CNR_RETURN_TRUE_THROTTLE_DEFAULT(logger());
   }
 
   virtual bool stopping(const ros::Time& time) 
   {
-    CNR_TRACE_START(this->m_opts.logger);
+    CNR_TRACE_START(logger());
     if(!cnr_regulator_interface::BaseRegulator::stopping(time))
     {
-      CNR_RETURN_FALSE(this->m_opts.logger);
+      CNR_RETURN_FALSE(logger());
     }
-    CNR_RETURN_TRUE(this->m_opts.logger);
+    CNR_RETURN_TRUE(logger());
   }
 
   void setRegulatorTime(const ros::Duration& time) { this->m_regulator_time = time;}
   const ros::Duration& getRegulatorTime() const { return this->m_regulator_time; }
-  
-  
-  const std::shared_ptr<STATE const>  getState0() const {return m_state0;}
-  const std::shared_ptr<STATE const>  getState () const {return m_state;}
-  
+   
+  std::shared_ptr<P const>  p ( ) const { return std::dynamic_pointer_cast<P const>(p_); }
+  std::shared_ptr<X const>  x0( ) const { return std::dynamic_pointer_cast<X const>(x0_);}
+  std::shared_ptr<X const>  x ( ) const { return std::dynamic_pointer_cast<X const>(x_); }
+  std::shared_ptr<X      >  x ( )       { return std::dynamic_pointer_cast<X      >(x_); }
+  std::shared_ptr<R const>  r ( ) const { return std::dynamic_pointer_cast<R const>(r_); }
+  //std::shared_ptr<R      >  r ( )       { return std::dynamic_pointer_cast<R      >(r_); }
+  std::shared_ptr<U const>  u ( ) const { return std::dynamic_pointer_cast<U const>(u_); }
+  std::shared_ptr<U      >  u ( )       { return std::dynamic_pointer_cast<U      >(u_); }
+  std::shared_ptr<Y const>  y ( ) const { return std::dynamic_pointer_cast<Y const>(y_); }
+  std::shared_ptr<Y      >  y ( )       { return std::dynamic_pointer_cast<Y      >(y_); }
+
 protected:
-  
-  OPTS m_opts;
-  std::shared_ptr<STATE>  m_state0;
-  std::shared_ptr<STATE>  m_state;
-  INPUT                   m_input;
-  std::shared_ptr<OUTPUT> m_output;
+
+  std::shared_ptr<R const > get(cnr_regulator_interface::BaseRegulatorReferenceConstPtr r)
+  {
+    std::shared_ptr<R const > _r = std::dynamic_pointer_cast<R const>(r);
+    if(!_r)
+    {
+      CNR_ERROR(logger(), "Recast failure. Check the objects type. Abort.");
+    }
+    return _r;
+  }
+  std::shared_ptr<Y const> get(cnr_regulator_interface::BaseRegulatorFeedbackConstPtr y)
+  {
+    std::shared_ptr<Y const > _y = std::dynamic_pointer_cast<Y const>(y);
+    if(!_y)
+    {
+      CNR_ERROR(logger(), "Recast failure. Check the objects type. Abort.");
+    }
+    return _y;
+  }
+  std::shared_ptr<U> get(cnr_regulator_interface::BaseRegulatorControlCommandPtr u)
+  {
+    std::shared_ptr<U> _u = std::dynamic_pointer_cast<U>(u);
+    if(!_u)
+    {
+      CNR_ERROR(logger(), "Recast failure. Check the objects type. Abort.");
+    }
+    return _u;
+  }
 };
 
-typedef RegulatorInterface<cnr_regulator_interface::JointRegulatorOptions,
-                           cnr_regulator_interface::JointRegulatorState,
-                           cnr_regulator_interface::JointRegulatorInput,
-                           cnr_regulator_interface::JointRegulatorOutput > BaseJointRegulator;
+
+using __BaseJointRegulator = RegulatorInterface<cnr_regulator_interface::JointRegulatorParams,
+                                                cnr_regulator_interface::JointRegulatorState,
+                                                cnr_regulator_interface::JointRegulatorReference,
+                                                cnr_regulator_interface::JointRegulatorControlCommand,
+                                                cnr_regulator_interface::JointRegulatorFeedback>;
+
+class BaseJointRegulator : public __BaseJointRegulator
+{
+public:
+  BaseJointRegulator() = default;
+  virtual ~BaseJointRegulator() = default;
+  BaseJointRegulator(const BaseJointRegulator&) = delete;
+  BaseJointRegulator& operator=(const BaseJointRegulator&) = delete;
+  BaseJointRegulator(BaseJointRegulator&&) = delete;
+  BaseJointRegulator& operator=(BaseJointRegulator&&) = delete;
+
+  bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time) override
+  {
+
+    CNR_TRACE_START(logger());
+    if(!cnr_regulator_interface::__BaseJointRegulator::starting(state0, time))
+    {
+      CNR_RETURN_FALSE(logger());
+    }
+    x()->setRobotState(kin());
+    CNR_RETURN_TRUE(logger());
+  }
+
+};
+
+using __BaseCartesianRegulator = RegulatorInterface<cnr_regulator_interface::CartesianRegulatorParams,
+                                                    cnr_regulator_interface::CartesianRegulatorState,
+                                                    cnr_regulator_interface::CartesianRegulatorReference,
+                                                    cnr_regulator_interface::JointRegulatorControlCommand, 
+                                                    cnr_regulator_interface::JointRegulatorFeedback >;
                            
-typedef RegulatorInterface<cnr_regulator_interface::CartesianRegulatorOptions,
-                           cnr_regulator_interface::CartesianRegulatorState,
-                           cnr_regulator_interface::CartesianRegulatorInput,
-                           cnr_regulator_interface::JointRegulatorOutput> BaseCartesianRegulator;
+class BaseCartesianRegulator : public  __BaseCartesianRegulator
+{
+public:
+  BaseCartesianRegulator() = default;
+  virtual ~BaseCartesianRegulator() = default;
+  BaseCartesianRegulator(const BaseCartesianRegulator&) = delete;
+  BaseCartesianRegulator& operator=(const BaseCartesianRegulator&) = delete;
+  BaseCartesianRegulator(BaseCartesianRegulator&&) = delete;
+  BaseCartesianRegulator& operator=(BaseCartesianRegulator&&) = delete;
+
+  bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time)override
+  {
+
+    CNR_TRACE_START(logger());
+    if(!cnr_regulator_interface::__BaseCartesianRegulator::starting(state0, time))
+    {
+      CNR_RETURN_FALSE(logger());
+    }
+    x()->setRobotState(kin());
+    CNR_RETURN_TRUE(logger());
+  }
+
+};
+
+                        
 
 }
 

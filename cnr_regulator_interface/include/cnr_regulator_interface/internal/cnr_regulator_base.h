@@ -44,10 +44,11 @@
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
 #include <cnr_interpolator_interface/cnr_interpolator_interface.h>
+#include <cnr_regulator_interface/cnr_regulator_params.h>
 #include <cnr_regulator_interface/cnr_regulator_state.h>
-#include <cnr_regulator_interface/cnr_regulator_options.h>
-#include <cnr_regulator_interface/cnr_regulator_inputs.h>
-#include <cnr_regulator_interface/cnr_regulator_outputs.h>
+#include <cnr_regulator_interface/cnr_regulator_references.h>
+#include <cnr_regulator_interface/cnr_regulator_control_commands.h>
+#include <cnr_regulator_interface/cnr_regulator_feedback.h>
 
 namespace cnr_regulator_interface
 {
@@ -65,25 +66,47 @@ public:
 
   virtual bool initialize(ros::NodeHandle&  root_nh, 
                           ros::NodeHandle& controller_nh, 
-                          cnr_regulator_interface::BaseRegulatorOptionsConstPtr opts);
+                          cnr_regulator_interface::BaseRegulatorParamsPtr opts);
 
   virtual bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, 
                         const ros::Time& /*time*/);
 
-  virtual bool update(cnr_interpolator_interface::InterpolatorInterfacePtr /*interpolator*/,
-                      BaseRegulatorInputConstPtr   /*input*/,
-                      BaseRegulatorOutputPtr       /*output*/);
+  virtual bool update(BaseRegulatorReferenceConstPtr /*r*/,
+                      BaseRegulatorFeedbackConstPtr  /*y*/,
+                      BaseRegulatorControlCommandPtr /*u*/);
+
+  virtual bool update(BaseRegulatorFeedbackConstPtr  /*y*/,
+                      BaseRegulatorControlCommandPtr /*u*/);
+
+  virtual bool update(BaseRegulatorReferenceConstPtr /*r*/,
+                      BaseRegulatorControlCommandPtr /*u*/);
+
+  virtual bool update(BaseRegulatorControlCommandPtr /*u*/);
 
   virtual bool stopping(const ros::Time& /*time*/) {return true;}
 
-  void setRegulatorTime(const ros::Duration& time) { m_regulator_time = time;}
-  const ros::Duration& getRegulatorTime() const { return m_regulator_time; }
+  void setRegulatorTime(const ros::Duration& time) { regulator_time_ = time;}
+  const ros::Duration& getRegulatorTime() const { return regulator_time_; }
+
+  cnr_interpolator_interface::InterpolatorInterfacePtr      interpolator() { return p_->interpolator; };
+  cnr_interpolator_interface::InterpolatorInterfaceConstPtr interpolator() const { return p_->interpolator; };
   
+  cnr_logger::TraceLoggerPtr                          logger()        { return p_->logger;    }
+  const size_t&                                       dim   () const  { return p_->dim;       }
+  const ros::Duration&                                period() const  { return p_->period;    }
+  cnr_controller_interface::KinematicsStructConstPtr  kin   () const  { return p_->robot_kin; }
+  cnr_controller_interface::KinematicsStructPtr       kin   ()        { return p_->robot_kin; }
+
 protected:
-  
-//  std::shared_ptr<cnr_logger::TraceLogger>  m_logger;
-  ros::Duration                             m_regulator_time;
-  std::vector<std::string>                  m_controlled_resources;
+  ros::Duration                 regulator_time_;
+  std::vector<std::string>      controlled_resources_;
+
+  BaseRegulatorParamsPtr         p_;  
+  BaseRegulatorStateConstPtr     x0_;
+  BaseRegulatorStatePtr          x_;
+  BaseRegulatorReferenceConstPtr r_;
+  BaseRegulatorControlCommandPtr u_;
+  BaseRegulatorFeedbackConstPtr  y_;
 };
 
 typedef std::shared_ptr<BaseRegulator> BaseRegulatorPtr;

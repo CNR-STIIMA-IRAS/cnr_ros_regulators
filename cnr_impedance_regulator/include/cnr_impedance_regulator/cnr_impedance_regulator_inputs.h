@@ -3,22 +3,22 @@
 
 #include <memory>
 #include <Eigen/Core>
-#include <cnr_regulator_interface/cnr_regulator_inputs.h>
+#include <cnr_regulator_interface/cnr_regulator_references.h>
 
 
 
 namespace cnr_impedance_regulator
 {
   
-struct ImpedanceRegulatorInput : public cnr_regulator_interface::BaseRegulatorInput
+struct ImpedanceRegulatorReference : public cnr_regulator_interface::BaseRegulatorReference
 {
-  ImpedanceRegulatorInput() = default;
-  virtual ~ImpedanceRegulatorInput() = default;
-  ImpedanceRegulatorInput(const ImpedanceRegulatorInput&) = delete;
-  ImpedanceRegulatorInput(ImpedanceRegulatorInput&&) = delete;
-  ImpedanceRegulatorInput& operator=(ImpedanceRegulatorInput&&) = delete;
+  ImpedanceRegulatorReference() = default;
+  virtual ~ImpedanceRegulatorReference() = default;
+  ImpedanceRegulatorReference(const ImpedanceRegulatorReference&) = delete;
+  ImpedanceRegulatorReference(ImpedanceRegulatorReference&&) = delete;
+  ImpedanceRegulatorReference& operator=(ImpedanceRegulatorReference&&) = delete;
 
-  ImpedanceRegulatorInput(size_t nAx): cnr_regulator_interface::BaseRegulatorInput( (nAx*4) ){}
+  ImpedanceRegulatorReference(size_t nAx): cnr_regulator_interface::BaseRegulatorReference( (nAx*4) ){}
 
   void set_x             (const Eigen::VectorXd& x     ) { u.segment(6+0*dim,dim) = x     ; }
   void set_xd            (const Eigen::VectorXd& xd    ) { u.segment(6+1*dim,dim) = xd    ; }
@@ -30,7 +30,7 @@ struct ImpedanceRegulatorInput : public cnr_regulator_interface::BaseRegulatorIn
   Eigen::VectorXd get_xdd   ( ) const { return u.segment(6+2*dim,dim); }
   Eigen::VectorXd get_effort( ) const { return u.segment(6+3*dim,dim); }
 
-  ImpedanceRegulatorInput& operator=(const ImpedanceRegulatorInput& rhs)
+  ImpedanceRegulatorReference& operator=(const ImpedanceRegulatorReference& rhs)
   {
     this->dim = rhs.dim;
     this->u   = rhs.u;
@@ -38,8 +38,8 @@ struct ImpedanceRegulatorInput : public cnr_regulator_interface::BaseRegulatorIn
   }
 };
 
-typedef std::shared_ptr<ImpedanceRegulatorInput> ImpedanceRegulatorInputPtr;
-typedef const std::shared_ptr<ImpedanceRegulatorInput const> ImpedanceRegulatorInputConstPtr;
+typedef std::shared_ptr<ImpedanceRegulatorReference> ImpedanceRegulatorReferencePtr;
+typedef std::shared_ptr<ImpedanceRegulatorReference const> ImpedanceRegulatorReferenceConstPtr;
   
 
 }  // namespace cnr_joint_impedance_regulator

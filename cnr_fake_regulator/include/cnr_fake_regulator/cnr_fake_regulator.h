@@ -19,19 +19,40 @@ public:
   FakeRegulator& operator=(FakeRegulator&&) = delete;
 
   virtual bool initialize(ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh, 
-                          cnr_regulator_interface::BaseRegulatorOptionsConstPtr opts);
+                          cnr_regulator_interface::BaseRegulatorParamsPtr opts) override;
 
-  bool update(cnr_interpolator_interface::InterpolatorInterfacePtr,
-              cnr_regulator_interface::BaseRegulatorInputConstPtr input,
-              cnr_regulator_interface::BaseRegulatorOutputPtr output);
+  virtual bool update(cnr_regulator_interface::BaseRegulatorReferenceConstPtr r,
+                      cnr_regulator_interface::BaseRegulatorFeedbackConstPtr  y,
+                      cnr_regulator_interface::BaseRegulatorControlCommandPtr u) override
+  {
+    CNR_ERROR_THROTTLE(logger(),10.0, "The regulator does not need any feedback!");
+    return update(r, u);
+  }
 
-  virtual bool starting(cnr_regulator_interface::BaseRegulatorStatePtr state0, const ros::Time& time);
+  bool update(cnr_regulator_interface::BaseRegulatorFeedbackConstPtr  y,
+              cnr_regulator_interface::BaseRegulatorControlCommandPtr u) override
+  {
+    CNR_ERROR(logger(), "The regulator needs the reference override, while it does not use the feedback!");
+    CNR_RETURN_FALSE(logger());
+  }
+
+  bool update(cnr_regulator_interface::BaseRegulatorReferenceConstPtr r,
+              cnr_regulator_interface::BaseRegulatorControlCommandPtr u) override;
+
+  
+  bool update(cnr_regulator_interface::BaseRegulatorControlCommandPtr u) override
+  {
+    CNR_ERROR(logger(), "The regulator needs the reference override!");
+    CNR_RETURN_FALSE(logger());
+  }
+
+  virtual bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time) override;
 
 };
 
 
 typedef std::shared_ptr<FakeRegulator> FakeRegulatorPtr;
-typedef const std::shared_ptr<FakeRegulator const > FakeRegulatorConstPtr;
+typedef std::shared_ptr<FakeRegulator const > FakeRegulatorConstPtr;
 
 
 
