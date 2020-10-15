@@ -4,7 +4,7 @@
 #include <memory>
 #include <eigen3/Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
-#include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
+#include <rosdyn_core/chain_state.h>
 #include <cnr_regulator_interface/cnr_regulator_params.h>
 
 namespace cnr_impedance_regulator

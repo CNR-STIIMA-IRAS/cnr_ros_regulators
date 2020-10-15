@@ -15,14 +15,14 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(catkin REQUIRED COMPONENTS
   cnr_interpolator_interface
   cnr_regulator_interface
-  cnr_controller_interface
+  
   pluginlib
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS cnr_interpolator_interface cnr_regulator_interface cnr_controller_interface pluginlib
+  CATKIN_DEPENDS cnr_interpolator_interface cnr_regulator_interface  pluginlib
 #  DEPENDS system_lib
 )
 

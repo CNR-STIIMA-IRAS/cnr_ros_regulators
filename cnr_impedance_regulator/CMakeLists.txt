@@ -15,7 +15,7 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(catkin REQUIRED COMPONENTS
   cnr_interpolator_interface
   cnr_regulator_interface
-  cnr_controller_interface
+  
   pluginlib
   sensor_msgs
   geometry_msgs
@@ -26,7 +26,7 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS cnr_interpolator_interface cnr_regulator_interface cnr_controller_interface pluginlib
+  CATKIN_DEPENDS cnr_interpolator_interface cnr_regulator_interface  pluginlib
 #  DEPENDS system_lib
 )
 

@@ -49,14 +49,17 @@ bool FakeRegulator::update(cnr_regulator_interface::BaseRegulatorReferenceConstP
 
   cnr_interpolator_interface::JointInputPtr  interpolator_input(new cnr_interpolator_interface::JointInput());
   cnr_interpolator_interface::JointOutputPtr interpolator_output(new cnr_interpolator_interface::JointOutput());
-  interpolator_input->override = r()->get_target_override();
-  interpolator_input->time     = regulator_time_;
+  interpolator_input->override() = r()->get_target_override();
+  interpolator_input->time()     = regulator_time_;
 
   if(!interpolator())
   {
     CNR_RETURN_FALSE(logger());
   }
-  interpolator()->interpolate(interpolator_input, interpolator_output);
+  if(!interpolator()->interpolate(interpolator_input, interpolator_output))
+  {
+    CNR_RETURN_FALSE(logger());
+  }
 
   regulator_time_ += period() * u()->get_scaling();
 

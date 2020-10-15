@@ -4,7 +4,7 @@
 #include <memory>
 #include <ros/time.h>
 #include <cnr_logger/cnr_logger.h>
-#include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
+#include <rosdyn_core/chain_state.h>
 
 
 
@@ -35,8 +35,8 @@ struct BaseRegulatorParams
   cnr_logger::TraceLoggerPtr  logger;
   size_t                      dim;
   ros::Duration               period;
-  cnr_controller_interface::KinematicsStructPtr robot_kin;
-  cnr_interpolator_interface::InterpolatorInterfacePtr interpolator;
+  rosdyn::ChainInterfacePtr robot_kin;
+  cnr_interpolator_interface::InterpolatorBasePtr interpolator;
   
   
   BaseRegulatorParams& operator<<(const BaseRegulatorParams::ConstPtr& rhs)

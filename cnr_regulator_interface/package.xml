@@ -33,9 +33,9 @@
   <build_export_depend>trajectory_msgs</build_export_depend>
   <exec_depend>trajectory_msgs</exec_depend>
 
-  <build_depend>cnr_controller_interface</build_depend>
-  <build_export_depend>cnr_controller_interface</build_export_depend>
-  <exec_depend>cnr_controller_interface</exec_depend>
+  
+  
+  
 
   <build_depend>cnr_interpolator_interface</build_depend>
   <build_export_depend>cnr_interpolator_interface</build_export_depend>

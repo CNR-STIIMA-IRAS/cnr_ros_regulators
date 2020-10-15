@@ -4,7 +4,7 @@
 #include <memory>
 #include <eigen3/Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
-#include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
+#include <rosdyn_core/chain_state.h>
 
 namespace cnr_regulator_interface
 {
@@ -29,7 +29,7 @@ typedef std::shared_ptr<BaseRegulatorState const> BaseRegulatorStateConstPtr;
 class JointRegulatorState : public cnr_regulator_interface::BaseRegulatorState
 {
 protected:
-  cnr_controller_interface::KinematicStatusPtr robot_state;
+  rosdyn::ChainStatePtr robot_state;
   
 public:
   typedef std::shared_ptr<JointRegulatorState> Ptr;
@@ -41,40 +41,40 @@ public:
   JointRegulatorState(JointRegulatorState&&) = delete;
   JointRegulatorState& operator=(JointRegulatorState&&) = delete;
 
-  JointRegulatorState(cnr_controller_interface::KinematicsStructPtr kin)
+  JointRegulatorState(rosdyn::ChainInterfacePtr kin)
   {
-    robot_state.reset(new cnr_controller_interface::KinematicStatus(kin));
+    robot_state.reset(new rosdyn::ChainState(kin));
   }
   
-  JointRegulatorState(const cnr_controller_interface::KinematicStatus& status)
+  JointRegulatorState(const rosdyn::ChainState& status)
   {
     setRobotState(status);
   }
 
-  cnr_controller_interface::KinematicStatusPtr getRobotState() 
+  rosdyn::ChainStatePtr getRobotState() 
   { 
     return robot_state;
   }
 
-  cnr_controller_interface::KinematicStatusConstPtr getRobotState() const 
+  rosdyn::ChainStateConstPtr getRobotState() const 
   { 
     return robot_state; 
    }
   
-  virtual void setRobotState(const cnr_controller_interface::KinematicStatus& status)
+  virtual void setRobotState(const rosdyn::ChainState& status)
   {
     if(!robot_state)
     {
-      robot_state.reset(new cnr_controller_interface::KinematicStatus(status.getKin()));
+      robot_state.reset(new rosdyn::ChainState(status.getKin()));
     }
     *robot_state = status;
   }
   
-  virtual void setRobotState(cnr_controller_interface::KinematicStatusConstPtr& status)
+  virtual void setRobotState(rosdyn::ChainStateConstPtr& status)
   {
     if(!robot_state)
     {
-      robot_state.reset(new cnr_controller_interface::KinematicStatus(status->getKin()));
+      robot_state.reset(new rosdyn::ChainState(status->getKin()));
     }
     *robot_state = *status;
   }
@@ -101,20 +101,20 @@ public:
   CartesianRegulatorState& operator=(CartesianRegulatorState&&) = delete;
 
   CartesianRegulatorState( ) = default;
-  CartesianRegulatorState(cnr_controller_interface::KinematicsStructPtr kin) : JointRegulatorState(kin)
+  CartesianRegulatorState(rosdyn::ChainInterfacePtr kin) : JointRegulatorState(kin)
   {
   }
-  CartesianRegulatorState(const cnr_controller_interface::KinematicStatus& status) : JointRegulatorState(status)
+  CartesianRegulatorState(const rosdyn::ChainState& status) : JointRegulatorState(status)
   {
   }
   
-  virtual void setRobotState(const cnr_controller_interface::KinematicStatus& status)
+  virtual void setRobotState(const rosdyn::ChainState& status)
   {
     JointRegulatorState::setRobotState(status);
     robot_state->updateTransformation();
   }
   
-  virtual void setRobotState(cnr_controller_interface::KinematicStatusConstPtr& status) override
+  virtual void setRobotState(rosdyn::ChainStateConstPtr& status) override
   {
     JointRegulatorState::setRobotState(status);
     robot_state->updateTransformation();

@@ -41,7 +41,7 @@
 #include <cnr_logger/cnr_logger.h>
 #include <trajectory_msgs/JointTrajectory.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
-#include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
+#include <rosdyn_core/chain_state.h>
 #include <cnr_interpolator_interface/cnr_interpolator_interface.h>
 #include <cnr_regulator_interface/internal/cnr_regulator_base.h>
 

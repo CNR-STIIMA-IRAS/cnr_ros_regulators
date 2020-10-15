@@ -4,7 +4,7 @@
 #include <memory>
 #include <eigen3/Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
-#include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
+#include <rosdyn_core/chain_state.h>
 #include <cnr_regulator_interface/cnr_regulator_state.h>
 
 namespace cnr_impedance_regulator
@@ -22,9 +22,9 @@ struct ImpedanceRegulatorState : public cnr_regulator_interface::JointRegulatorS
   ImpedanceRegulatorState(ImpedanceRegulatorState&&) = delete;
   ImpedanceRegulatorState& operator=(ImpedanceRegulatorState&&) = delete;
   
-  ImpedanceRegulatorState(cnr_controller_interface::KinematicsStructPtr kin) : JointRegulatorState(kin) {}
+  ImpedanceRegulatorState(rosdyn::ChainInterfacePtr kin) : JointRegulatorState(kin) {}
   
-  ImpedanceRegulatorState(const cnr_controller_interface::KinematicStatus& status) : JointRegulatorState(status) {}
+  ImpedanceRegulatorState(const rosdyn::ChainState& status) : JointRegulatorState(status) {}
   
   struct Model
   {
@@ -43,7 +43,7 @@ struct ImpedanceRegulatorState : public cnr_regulator_interface::JointRegulatorS
   
   std::shared_ptr<Model> model;
   
-  ImpedanceRegulatorState& setModelState(const cnr_controller_interface::KinematicStatus& status)
+  ImpedanceRegulatorState& setModelState(const rosdyn::ChainState& status)
   {
     if(!model)
     {

@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   pluginlib
   trajectory_msgs
-  cnr_controller_interface
+  
   cnr_interpolator_interface
 )
 

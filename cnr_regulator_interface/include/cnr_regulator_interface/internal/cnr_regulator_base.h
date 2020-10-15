@@ -42,7 +42,7 @@
 #include <cnr_logger/cnr_logger.h>
 #include <trajectory_msgs/JointTrajectory.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
-#include <cnr_controller_interface/utils/cnr_kinematics_utils.h>
+#include <rosdyn_core/chain_state.h>
 #include <cnr_interpolator_interface/cnr_interpolator_interface.h>
 #include <cnr_regulator_interface/cnr_regulator_params.h>
 #include <cnr_regulator_interface/cnr_regulator_state.h>
@@ -88,14 +88,14 @@ public:
   void setRegulatorTime(const ros::Duration& time) { regulator_time_ = time;}
   const ros::Duration& getRegulatorTime() const { return regulator_time_; }
 
-  cnr_interpolator_interface::InterpolatorInterfacePtr      interpolator() { return p_->interpolator; };
-  cnr_interpolator_interface::InterpolatorInterfaceConstPtr interpolator() const { return p_->interpolator; };
+  cnr_interpolator_interface::InterpolatorBasePtr      interpolator() { return p_->interpolator; };
+  cnr_interpolator_interface::InterpolatorBaseConstPtr interpolator() const { return p_->interpolator; };
   
   cnr_logger::TraceLoggerPtr                          logger()        { return p_->logger;    }
   const size_t&                                       dim   () const  { return p_->dim;       }
   const ros::Duration&                                period() const  { return p_->period;    }
-  cnr_controller_interface::KinematicsStructConstPtr  kin   () const  { return p_->robot_kin; }
-  cnr_controller_interface::KinematicsStructPtr       kin   ()        { return p_->robot_kin; }
+  rosdyn::ChainInterfaceConstPtr  kin   () const  { return p_->robot_kin; }
+  rosdyn::ChainInterfacePtr       kin   ()        { return p_->robot_kin; }
 
 protected:
   ros::Duration                 regulator_time_;
