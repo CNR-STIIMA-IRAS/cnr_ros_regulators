@@ -1,17 +1,17 @@
 cmake_minimum_required(VERSION 3.1)
 project(cnr_regulator_interface)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(catkin REQUIRED COMPONENTS
   cnr_logger
+  realtime_utilities
   roscpp
   pluginlib
   trajectory_msgs
-  
   cnr_interpolator_interface
 )
 
@@ -34,9 +34,8 @@ catkin_package(
 include_directories( include ${catkin_INCLUDE_DIRS} )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}
-   src/${PROJECT_NAME}/cnr_regulator_base.cpp
-)
+add_library(${PROJECT_NAME} src/${PROJECT_NAME}/cnr_regulator_base.cpp)
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Ofast -funroll-loops -msse2")
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

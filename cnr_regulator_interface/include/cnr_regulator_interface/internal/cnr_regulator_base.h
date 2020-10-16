@@ -53,7 +53,6 @@
 namespace cnr_regulator_interface
 {
 
-
 class BaseRegulator
 {
 public:
@@ -98,9 +97,10 @@ public:
   rosdyn::ChainInterfacePtr       kin   ()        { return p_->robot_kin; }
 
 protected:
+
   ros::Duration                 regulator_time_;
   std::vector<std::string>      controlled_resources_;
-
+  
   BaseRegulatorParamsPtr         p_;  
   BaseRegulatorStateConstPtr     x0_;
   BaseRegulatorStatePtr          x_;

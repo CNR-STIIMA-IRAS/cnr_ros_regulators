@@ -77,7 +77,6 @@ bool BaseRegulator::update( BaseRegulatorReferenceConstPtr   r,
                             BaseRegulatorControlCommandPtr   u)
 {
   r_ = r;
-  y_.reset();
   u_ = u;
   return true;
 }
@@ -85,7 +84,6 @@ bool BaseRegulator::update( BaseRegulatorReferenceConstPtr   r,
 bool BaseRegulator::update( BaseRegulatorFeedbackConstPtr    y,
                             BaseRegulatorControlCommandPtr   u)
 {
-  r_.reset();
   y_ = y;
   u_ = u;
   return true;
@@ -93,8 +91,6 @@ bool BaseRegulator::update( BaseRegulatorFeedbackConstPtr    y,
 
 bool BaseRegulator::update( BaseRegulatorControlCommandPtr   u)
 {
-  r_.reset();
-  y_.reset();
   u_ = u;
   return true;
 }
