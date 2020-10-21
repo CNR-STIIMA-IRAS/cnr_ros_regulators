@@ -4,7 +4,7 @@
 #include <memory>
 #include <eigen3/Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
-#include <rosdyn_core/chain_state.h>
+#include <rosdyn_utilities/chain_state.h>
 
 namespace cnr_regulator_interface
 {
@@ -112,7 +112,7 @@ public:
   CartesianRegulatorFeedback& setRobotState(const rosdyn::ChainState& state) 
   {
     *robot_state = state;
-    robot_state->updateTransformation();
+    robot_state->updateTransformations();
     return *this;
   }
   

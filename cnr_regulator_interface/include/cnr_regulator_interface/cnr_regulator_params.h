@@ -4,7 +4,7 @@
 #include <memory>
 #include <ros/time.h>
 #include <cnr_logger/cnr_logger.h>
-#include <rosdyn_core/chain_state.h>
+#include <rosdyn_utilities/chain_state.h>
 
 
 

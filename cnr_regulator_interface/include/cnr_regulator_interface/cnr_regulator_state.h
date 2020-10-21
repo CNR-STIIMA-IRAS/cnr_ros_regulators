@@ -4,7 +4,7 @@
 #include <memory>
 #include <eigen3/Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
-#include <rosdyn_core/chain_state.h>
+#include <rosdyn_utilities/chain_state.h>
 
 namespace cnr_regulator_interface
 {
@@ -111,13 +111,13 @@ public:
   virtual void setRobotState(const rosdyn::ChainState& status)
   {
     JointRegulatorState::setRobotState(status);
-    robot_state->updateTransformation();
+    robot_state->updateTransformations();
   }
   
   virtual void setRobotState(rosdyn::ChainStateConstPtr& status) override
   {
     JointRegulatorState::setRobotState(status);
-    robot_state->updateTransformation();
+    robot_state->updateTransformations();
   }
   
 

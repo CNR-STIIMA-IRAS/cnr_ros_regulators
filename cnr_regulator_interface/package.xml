@@ -6,7 +6,6 @@
 
   <maintainer email="tesla@todo.todo">tesla</maintainer>
 
-
   <license>BSD</license>
 
 
@@ -22,10 +21,8 @@
   <depend>pluginlib</depend>
   <depend>trajectory_msgs</depend>
   <depend>cnr_interpolator_interface</depend>
+  <depend>rosdyn_utilities</depend>
 
-  <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-
   </export>
 </package>

@@ -22,8 +22,8 @@ void get_resource_names(ros::NodeHandle* nh, std::vector<std::string>& names)
   return;
 }
 
-bool BaseRegulator::initialize(ros::NodeHandle&   root_nh,
-                               ros::NodeHandle&   controller_nh,
+bool BaseRegulator::initialize(ros::NodeHandle& root_nh,
+                               ros::NodeHandle& controller_nh,
                                cnr_regulator_interface::BaseRegulatorParamsPtr params)
 {
   if(!params)

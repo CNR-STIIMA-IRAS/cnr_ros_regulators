@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   trajectory_msgs
   cnr_interpolator_interface
+  rosdyn_utilities
 )
 
 find_package(Boost REQUIRED COMPONENTS system)
@@ -21,7 +22,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES cnr_regulator_interface
-  CATKIN_DEPENDS cnr_logger roscpp pluginlib trajectory_msgs cnr_interpolator_interface cnr_interpolator_interface
+  CATKIN_DEPENDS cnr_logger roscpp pluginlib trajectory_msgs cnr_interpolator_interface cnr_interpolator_interface rosdyn_utilities
 #  DEPENDS system_lib
 )
 
