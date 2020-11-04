@@ -2,7 +2,7 @@
 #define CNR_REGULATOR_INTERFACE__CNR_REGULATOR_STATE__H
 
 #include <memory>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
 #include <rosdyn_utilities/chain_state.h>
 
@@ -18,7 +18,7 @@ struct BaseRegulatorState
   BaseRegulatorState() = default;
   virtual ~BaseRegulatorState() = default;
   BaseRegulatorState(const BaseRegulatorState&) = delete;
-  BaseRegulatorState& operator=(const BaseRegulatorState&) = delete;
+  BaseRegulatorState& operator=(const BaseRegulatorState&) = default;
   BaseRegulatorState(BaseRegulatorState&&) = delete;
   BaseRegulatorState& operator=(BaseRegulatorState&&) = delete;
 };
@@ -37,7 +37,16 @@ public:
 
   JointRegulatorState() = default;
   virtual ~JointRegulatorState() = default;
-  JointRegulatorState(const JointRegulatorState&) = delete;
+  JointRegulatorState(const JointRegulatorState& cpy)
+  {
+    *this = cpy;
+  };
+  JointRegulatorState& operator=(const JointRegulatorState& rhs)
+  {
+    this->setRobotState(rhs.getRobotState());
+    return *this;
+  };
+
   JointRegulatorState(JointRegulatorState&&) = delete;
   JointRegulatorState& operator=(JointRegulatorState&&) = delete;
 
@@ -70,7 +79,7 @@ public:
     *robot_state = status;
   }
   
-  virtual void setRobotState(rosdyn::ChainStateConstPtr& status)
+  virtual void setRobotState(rosdyn::ChainStateConstPtr status)
   {
     if(!robot_state)
     {
@@ -95,15 +104,25 @@ public:
   typedef std::shared_ptr<CartesianRegulatorState const> ConstPtr;
   
   virtual ~CartesianRegulatorState() = default;
-  CartesianRegulatorState(const CartesianRegulatorState&) = delete;
+  CartesianRegulatorState(const CartesianRegulatorState& cpy)
+  {
+    *this = cpy;
+  }
+  CartesianRegulatorState& operator=(const CartesianRegulatorState& rhs)
+  {
+    this->setRobotState(rhs.getRobotState());
+    return *this;
+  }
   
   CartesianRegulatorState(CartesianRegulatorState&&) = delete;
   CartesianRegulatorState& operator=(CartesianRegulatorState&&) = delete;
 
   CartesianRegulatorState( ) = default;
+  
   CartesianRegulatorState(rosdyn::ChainInterfacePtr kin) : JointRegulatorState(kin)
   {
   }
+
   CartesianRegulatorState(const rosdyn::ChainState& status) : JointRegulatorState(status)
   {
   }
@@ -114,13 +133,11 @@ public:
     robot_state->updateTransformations();
   }
   
-  virtual void setRobotState(rosdyn::ChainStateConstPtr& status) override
+  virtual void setRobotState(rosdyn::ChainStateConstPtr status) override
   {
     JointRegulatorState::setRobotState(status);
     robot_state->updateTransformations();
   }
-  
-
 };
 
 typedef CartesianRegulatorState::Ptr CartesianRegulatorStatePtr;

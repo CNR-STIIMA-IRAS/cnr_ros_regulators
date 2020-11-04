@@ -2,7 +2,7 @@
 #define CNR_REGULATOR_INTERFACE__CNR_REGULATOR_FEEDBACK__H
 
 #include <memory>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
 #include <rosdyn_utilities/chain_state.h>
 

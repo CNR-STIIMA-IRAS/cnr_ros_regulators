@@ -95,6 +95,7 @@ public:
       CNR_RETURN_FALSE(logger());
     }
     std::shared_ptr<X> x( new X( ) );
+    *x = *_x0;
     this->x_ = x;
     CNR_RETURN_TRUE(logger());
   }
@@ -271,13 +272,11 @@ public:
 
   bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time)override
   {
-
     CNR_TRACE_START(logger());
     if(!cnr_regulator_interface::__BaseCartesianRegulator::starting(state0, time))
     {
       CNR_RETURN_FALSE(logger());
     }
-    x()->setRobotState(kin());
     CNR_RETURN_TRUE(logger());
   }
 

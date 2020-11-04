@@ -2,7 +2,7 @@
 #define CNR_REGULATOR_INTERFACE__CNR_REGULATOR_INPUTS__H
 
 #include <ros/time.h>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
 #include <memory>
 

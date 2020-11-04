@@ -1,12 +1,13 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.1)
 project(cnr_impedance_regulator)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-
-set(CMAKE_CXX_STANDARD 11)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_BUILD_TYPE Debug)
+
 
 
 ## Find catkin macros and libraries
@@ -34,18 +35,14 @@ catkin_package(
 ## Build ##
 ###########
 
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(
- include
-  ${catkin_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
-)
+include_directories(include ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}
-   src/${PROJECT_NAME}/cnr_impedance_regulator.cpp
-)
+add_library(${PROJECT_NAME} src/${PROJECT_NAME}/cnr_impedance_regulator.cpp)
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} Eigen3::Eigen)
+target_compile_options(${PROJECT_NAME} PUBLIC -Wall -faligned-new -msse4.2   $<$<CONFIG:RELEASE>:-Ofast>)
+##target_compile_definitions(${PROJECT_NAME} PUBLIC -DEIGEN_MAX_ALIGN_BYTES=32)
 
 #############
 ## Install ##
