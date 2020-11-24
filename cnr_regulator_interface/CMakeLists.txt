@@ -40,8 +40,8 @@ include_directories( include ${catkin_INCLUDE_DIRS} )
 add_library(${PROJECT_NAME} src/${PROJECT_NAME}/cnr_regulator_base.cpp)
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} Eigen3::Eigen)
-target_compile_options(${PROJECT_NAME} PUBLIC -Wall -faligned-new -msse4.2   $<$<CONFIG:RELEASE>:-Ofast>)
-##target_compile_definitions(${PROJECT_NAME} PUBLIC -DEIGEN_MAX_ALIGN_BYTES=32)
+target_compile_options(${PROJECT_NAME} PUBLIC -Wall $<$<CONFIG:RELEASE>:-Ofast>)
+#target_compile_definitions(${PROJECT_NAME} PUBLIC -DEIGEN_DONT_VECTORIZE=1)
 
 # Mark cpp header files for installation
  install(DIRECTORY include/${PROJECT_NAME}/
