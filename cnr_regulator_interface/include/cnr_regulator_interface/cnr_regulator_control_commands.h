@@ -2,7 +2,7 @@
 #define CNR_REGULATOR_INTERFACE__CNR_REGULATOR_OUTPUTS__H
 
 #include <ros/time.h>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <memory>
 
 namespace cnr_regulator_interface

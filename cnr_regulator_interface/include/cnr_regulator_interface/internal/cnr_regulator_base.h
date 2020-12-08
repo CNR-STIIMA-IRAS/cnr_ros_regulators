@@ -37,7 +37,7 @@
 #define CNR_REGULATOR_INTERFACE__CNR_REGULATOR_BASE__H
 
 #include <ros/node_handle.h>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <memory>
 #include <cnr_logger/cnr_logger.h>
 #include <trajectory_msgs/JointTrajectory.h>
