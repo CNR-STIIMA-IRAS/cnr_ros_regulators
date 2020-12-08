@@ -30,7 +30,7 @@ typedef std::shared_ptr<BaseRegulatorFeedback const> BaseRegulatorFeedbackConstP
 class JointRegulatorFeedback : public cnr_regulator_interface::BaseRegulatorFeedback
 {
 protected:
-  rosdyn::ChainStatePtr robot_state;
+  rosdyn::ChainStateXPtr robot_state;
   
 public:
   typedef std::shared_ptr<JointRegulatorFeedback> Ptr;
@@ -44,35 +44,35 @@ public:
 
   JointRegulatorFeedback(rosdyn::ChainInterfacePtr kin)
   {
-    robot_state.reset(new rosdyn::ChainState(kin));
+    robot_state.reset(new rosdyn::ChainStateX(kin));
   }
   
-  JointRegulatorFeedback(const rosdyn::ChainState& status)
+  JointRegulatorFeedback(const rosdyn::ChainStateX& status)
   {
     setRobotState(status);
   }
   
-  rosdyn::ChainStateConstPtr getRobotState() const
+  rosdyn::ChainStateXConstPtr getRobotState() const
   {
     return robot_state;
   }
   
-  JointRegulatorFeedback& setRobotState(const rosdyn::ChainState& status)
+  JointRegulatorFeedback& setRobotState(const rosdyn::ChainStateX& status)
   {
     if(!robot_state)
     {
-      robot_state.reset(new rosdyn::ChainState(status.getKin()));
+      robot_state.reset(new rosdyn::ChainStateX(status.getKin()));
     }
     *robot_state = status;
     
     return *this;
   }
   
-  JointRegulatorFeedback& setRobotState(rosdyn::ChainStateConstPtr& status)
+  JointRegulatorFeedback& setRobotState(rosdyn::ChainStateXConstPtr& status)
   {
     if(!robot_state)
     {
-      robot_state.reset(new rosdyn::ChainState(status->getKin()));
+      robot_state.reset(new rosdyn::ChainStateX(status->getKin()));
     }
 
     *robot_state = *status;
@@ -105,11 +105,11 @@ public:
   CartesianRegulatorFeedback(rosdyn::ChainInterfacePtr kin) : JointRegulatorFeedback(kin)
   {
   }
-  CartesianRegulatorFeedback(const rosdyn::ChainState& status) : JointRegulatorFeedback(status)
+  CartesianRegulatorFeedback(const rosdyn::ChainStateX& status) : JointRegulatorFeedback(status)
   {
   }
   
-  CartesianRegulatorFeedback& setRobotState(const rosdyn::ChainState& state) 
+  CartesianRegulatorFeedback& setRobotState(const rosdyn::ChainStateX& state) 
   {
     *robot_state = state;
     robot_state->updateTransformations();

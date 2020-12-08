@@ -24,7 +24,7 @@ struct ImpedanceRegulatorState : public cnr_regulator_interface::JointRegulatorS
   
   ImpedanceRegulatorState(rosdyn::ChainInterfacePtr kin) : JointRegulatorState(kin) {}
   
-  ImpedanceRegulatorState(const rosdyn::ChainState& status) : JointRegulatorState(status) {}
+  ImpedanceRegulatorState(const rosdyn::ChainStateX& status) : JointRegulatorState(status) {}
   
   struct Model
   {
@@ -43,7 +43,7 @@ struct ImpedanceRegulatorState : public cnr_regulator_interface::JointRegulatorS
   
   std::shared_ptr<Model> model;
   
-  ImpedanceRegulatorState& setModelState(const rosdyn::ChainState& status)
+  ImpedanceRegulatorState& setModelState(const rosdyn::ChainStateX& status)
   {
     if(!model)
     {
