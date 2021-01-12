@@ -31,6 +31,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>cnr_interpolator_interface</build_depend>
   <build_depend>cnr_regulator_interface</build_depend>
+  <build_depend>rosparam_utilities</build_depend>
   
   <build_depend>pluginlib</build_depend>
   <build_depend>sensor_msgs</build_depend>
@@ -44,6 +45,7 @@
   <exec_depend>cnr_interpolator_interface</exec_depend>
   <exec_depend>cnr_regulator_interface</exec_depend>
   <exec_depend>pluginlib</exec_depend>
+  <exec_depend>rosparam_utilities</exec_depend>
   
 
   <!-- The export tag contains other, unspecified, tags -->

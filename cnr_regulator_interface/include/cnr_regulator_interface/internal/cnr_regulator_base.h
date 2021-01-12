@@ -50,8 +50,11 @@
 #include <cnr_regulator_interface/cnr_regulator_control_commands.h>
 #include <cnr_regulator_interface/cnr_regulator_feedback.h>
 
-namespace cnr_regulator_interface
+namespace cnr
 {
+namespace control
+{
+
 
 class BaseRegulator
 {
@@ -65,9 +68,9 @@ public:
 
   virtual bool initialize(ros::NodeHandle&  root_nh, 
                           ros::NodeHandle& controller_nh, 
-                          cnr_regulator_interface::BaseRegulatorParamsPtr opts);
+                          BaseRegulatorParamsPtr opts);
 
-  virtual bool starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, 
+  virtual bool starting(BaseRegulatorStateConstPtr state0,
                         const ros::Time& /*time*/);
 
   virtual bool update(BaseRegulatorReferenceConstPtr /*r*/,
@@ -87,14 +90,14 @@ public:
   void setRegulatorTime(const ros::Duration& time) { regulator_time_ = time;}
   const ros::Duration& getRegulatorTime() const { return regulator_time_; }
 
-  cnr_interpolator_interface::InterpolatorBasePtr      interpolator() { return p_->interpolator; };
-  cnr_interpolator_interface::InterpolatorBaseConstPtr interpolator() const { return p_->interpolator; };
+  InterpolatorBasePtr      interpolator() { return p_->interpolator; };
+  InterpolatorBaseConstPtr interpolator() const { return p_->interpolator; };
   
-  cnr_logger::TraceLoggerPtr                          logger()        { return p_->logger;    }
-  const size_t&                                       dim   () const  { return p_->dim;       }
-  const ros::Duration&                                period() const  { return p_->period;    }
-  rosdyn::ChainInterfaceConstPtr  kin   () const  { return p_->robot_kin; }
-  rosdyn::ChainInterfacePtr       kin   ()        { return p_->robot_kin; }
+  cnr_logger::TraceLoggerPtr     logger()        { return p_->logger;    }
+  const size_t&                  dim   () const  { return p_->dim;       }
+  const ros::Duration&           period() const  { return p_->period;    }
+  rosdyn::ChainInterfaceConstPtr kin   () const  { return p_->robot_kin; }
+  rosdyn::ChainInterfacePtr      kin   ()        { return p_->robot_kin; }
 
 protected:
 
@@ -111,6 +114,7 @@ protected:
 
 typedef std::shared_ptr<BaseRegulator> BaseRegulatorPtr;
 typedef std::shared_ptr<BaseRegulator const> BaseRegulatorConstPtr;
+}
 }
 
 #endif  // CNR_REGULATOR_INTERFACE__CNR_REGULATOR_BASE__H

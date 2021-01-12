@@ -6,7 +6,9 @@
 #include <rosdyn_core/spacevect_algebra.h>
 #include <rosdyn_utilities/chain_state.h>
 
-namespace cnr_regulator_interface
+namespace cnr
+{
+namespace control
 {
 
 
@@ -15,24 +17,33 @@ namespace cnr_regulator_interface
  */
 struct BaseRegulatorFeedback
 {
+  typedef std::shared_ptr<BaseRegulatorFeedback> Ptr;
+  typedef std::shared_ptr<BaseRegulatorFeedback const> ConstPtr;
+
   BaseRegulatorFeedback() = default;
   virtual ~BaseRegulatorFeedback() = default;
   BaseRegulatorFeedback(const BaseRegulatorFeedback&) = delete;
   BaseRegulatorFeedback& operator=(const BaseRegulatorFeedback&) = delete;
   BaseRegulatorFeedback(BaseRegulatorFeedback&&) = delete;
   BaseRegulatorFeedback& operator=(BaseRegulatorFeedback&&) = delete;
-
 };
 
-typedef std::shared_ptr<BaseRegulatorFeedback> BaseRegulatorFeedbackPtr;
-typedef std::shared_ptr<BaseRegulatorFeedback const> BaseRegulatorFeedbackConstPtr;
+typedef BaseRegulatorFeedback::Ptr BaseRegulatorFeedbackPtr;
+typedef BaseRegulatorFeedback::ConstPtr BaseRegulatorFeedbackConstPtr;
 
-class JointRegulatorFeedback : public cnr_regulator_interface::BaseRegulatorFeedback
+
+/**
+ * @brief JointRegulatorFeedback
+ */
+template<int N, int MaxN=N>
+class JointRegulatorFeedback : public BaseRegulatorFeedback
 {
 protected:
-  rosdyn::ChainStateXPtr robot_state;
+  rosdyn::ChainState<N,MaxN> robot_state;
   
 public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
   typedef std::shared_ptr<JointRegulatorFeedback> Ptr;
   typedef std::shared_ptr<JointRegulatorFeedback const> ConstPtr;
 
@@ -44,54 +55,36 @@ public:
 
   JointRegulatorFeedback(rosdyn::ChainInterfacePtr kin)
   {
-    robot_state.reset(new rosdyn::ChainStateX(kin));
+    robot_state.init(kin);
   }
-  
-  JointRegulatorFeedback(const rosdyn::ChainStateX& status)
-  {
-    setRobotState(status);
-  }
-  
-  rosdyn::ChainStateXConstPtr getRobotState() const
+
+  rosdyn::ChainState<N,MaxN>& robotState()
   {
     return robot_state;
   }
-  
-  JointRegulatorFeedback& setRobotState(const rosdyn::ChainStateX& status)
-  {
-    if(!robot_state)
-    {
-      robot_state.reset(new rosdyn::ChainStateX(status.getKin()));
-    }
-    *robot_state = status;
-    
-    return *this;
-  }
-  
-  JointRegulatorFeedback& setRobotState(rosdyn::ChainStateXConstPtr& status)
-  {
-    if(!robot_state)
-    {
-      robot_state.reset(new rosdyn::ChainStateX(status->getKin()));
-    }
 
-    *robot_state = *status;
-    
-    return *this;
+  const rosdyn::ChainState<N,MaxN>& robotState() const
+  {
+    return robot_state;
   }
 };
 
-typedef JointRegulatorFeedback::Ptr JointRegulatorFeedbackPtr;
-typedef JointRegulatorFeedback::ConstPtr JointRegulatorFeedbackConstPtr;
+template<int N, int MaxN=N>
+using JointRegulatorFeedbackPtr = typename JointRegulatorFeedback<N,MaxN>::Ptr;
+
+template<int N, int MaxN=N>
+using JointRegulatorFeedbackConstPtr = typename JointRegulatorFeedback<N,MaxN>::ConstPtr;
 
 
 /**
  * @brief The CartesianRegulatorFeedback struct
  */
-struct CartesianRegulatorFeedback : public cnr_regulator_interface::JointRegulatorFeedback
-{
-  
+template<int N,int MaxN>
+struct CartesianRegulatorFeedback : public JointRegulatorFeedback<N,MaxN>
+{ 
 public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
   typedef std::shared_ptr<CartesianRegulatorFeedback> Ptr;
   typedef std::shared_ptr<CartesianRegulatorFeedback const> ConstPtr;
   
@@ -102,27 +95,24 @@ public:
   CartesianRegulatorFeedback& operator=(CartesianRegulatorFeedback&&) = delete;
 
   CartesianRegulatorFeedback( ) = default;
-  CartesianRegulatorFeedback(rosdyn::ChainInterfacePtr kin) : JointRegulatorFeedback(kin)
+  CartesianRegulatorFeedback(rosdyn::ChainInterfacePtr kin) : JointRegulatorFeedback<N,MaxN>(kin)
   {
   }
-  CartesianRegulatorFeedback(const rosdyn::ChainStateX& status) : JointRegulatorFeedback(status)
-  {
-  }
-  
-  CartesianRegulatorFeedback& setRobotState(const rosdyn::ChainStateX& state) 
-  {
-    *robot_state = state;
-    robot_state->updateTransformations();
-    return *this;
-  }
-  
 
+  CartesianRegulatorFeedback(const rosdyn::ChainState<N,MaxN>& status) : JointRegulatorFeedback<N,MaxN>(status)
+  {
+  }
 };
 
-typedef CartesianRegulatorFeedback::Ptr CartesianRegulatorFeedbackPtr;
-typedef CartesianRegulatorFeedback::ConstPtr CartesianRegulatorFeedbackConstPtr;
+template<int N, int MaxN=N>
+using CartesianRegulatorFeedbackPtr = typename CartesianRegulatorFeedback<N,MaxN>::Ptr;
+
+template<int N, int MaxN=N>
+using CartesianRegulatorFeedbackConstPtr = typename CartesianRegulatorFeedback<N,MaxN>::ConstPtr;
 
 
-}  // namespace cnr_regulator_interface
+}  // namespace control
+}  // namespace cnr
+
 
 #endif  // CNR_REGULATOR_INTERFACE__CNR_REGULATOR_FEEDBACK__H

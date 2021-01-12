@@ -6,9 +6,10 @@
 #include <rosdyn_core/spacevect_algebra.h>
 #include <rosdyn_utilities/chain_state.h>
 
-namespace cnr_regulator_interface
+namespace cnr
 {
-
+namespace control
+{
 
 /**
  * @brief The BaseRegulatorState struct
@@ -26,123 +27,73 @@ struct BaseRegulatorState
 typedef std::shared_ptr<BaseRegulatorState> BaseRegulatorStatePtr;
 typedef std::shared_ptr<BaseRegulatorState const> BaseRegulatorStateConstPtr;
 
-class JointRegulatorState : public cnr_regulator_interface::BaseRegulatorState
+/**
+ * @brief JointRegulatorState
+ */
+template<int N, int MaxN=N>
+class JointRegulatorState : public BaseRegulatorState
 {
 protected:
-  rosdyn::ChainStateXPtr robot_state;
+  rosdyn::ChainState<N,MaxN> robot_state;
 
 public:
   typedef std::shared_ptr<JointRegulatorState> Ptr;
-  typedef std::shared_ptr<JointRegulatorState const> ConstPtr;
+  typedef std::shared_ptr<JointRegulatorState<N,MaxN> const> ConstPtr;
 
   JointRegulatorState() = default;
   virtual ~JointRegulatorState() = default;
   JointRegulatorState(const JointRegulatorState& cpy)
   {
     *this = cpy;
-  };
-  JointRegulatorState& operator=(const JointRegulatorState& rhs)
-  {
-    this->setRobotState(rhs.getRobotState());
-    return *this;
-  };
+  }
 
   JointRegulatorState(JointRegulatorState&&) = delete;
   JointRegulatorState& operator=(JointRegulatorState&&) = delete;
 
   JointRegulatorState(rosdyn::ChainInterfacePtr kin)
+    : robot_state(kin)
   {
-    robot_state.reset(new rosdyn::ChainStateX(kin));
   }
 
-  JointRegulatorState(const rosdyn::ChainStateX& status)
+  //! no update transform!
+  JointRegulatorState& operator=(const JointRegulatorState& rhs)
   {
-    setRobotState(status);
+    robot_state = rhs.robot_state;
+    return *this;
   }
 
-  rosdyn::ChainStateXPtr getRobotState()
+  rosdyn::ChainState<N,MaxN>& robotState()
   {
     return robot_state;
   }
 
-  rosdyn::ChainStateXConstPtr getRobotState() const
+  const rosdyn::ChainState<N,MaxN>& robotState() const
   {
     return robot_state;
-  }
-
-  virtual void setRobotState(const rosdyn::ChainStateX& status)
-  {
-    if(!robot_state)
-    {
-      robot_state.reset(new rosdyn::ChainStateX(status.getKin()));
-    }
-    *robot_state = status;
-  }
-
-  virtual void setRobotState(rosdyn::ChainStateXConstPtr status)
-  {
-    if(!robot_state)
-    {
-      robot_state.reset(new rosdyn::ChainStateX(status->getKin()));
-    }
-    *robot_state = *status;
   }
 };
 
-typedef JointRegulatorState::Ptr JointRegulatorStatePtr;
-typedef JointRegulatorState::ConstPtr JointRegulatorStateConstPtr;
+template<int N, int MaxN=N>
+using JointRegulatorStatePtr = typename JointRegulatorState<N,MaxN>::Ptr;
+
+template<int N, int MaxN=N>
+using JointRegulatorStateConstPtr = typename JointRegulatorState<N,MaxN>::ConstPtr;
 
 
 /**
  * @brief The CartesianRegulatorState struct
  */
-struct CartesianRegulatorState : public cnr_regulator_interface::JointRegulatorState
-{
-public:
-  typedef std::shared_ptr<CartesianRegulatorState> Ptr;
-  typedef std::shared_ptr<CartesianRegulatorState const> ConstPtr;
+template<int N, int MaxN=N>
+using CartesianRegulatorState = JointRegulatorState<N,MaxN>;
 
-  virtual ~CartesianRegulatorState() = default;
-  CartesianRegulatorState(const CartesianRegulatorState& cpy)
-  {
-    *this = cpy;
-  }
-  CartesianRegulatorState& operator=(const CartesianRegulatorState& rhs)
-  {
-    this->setRobotState(rhs.getRobotState());
-    return *this;
-  }
+template<int N, int MaxN>
+using CartesianRegulatorStatePtr = typename CartesianRegulatorState<N,MaxN>::Ptr;
 
-  CartesianRegulatorState(CartesianRegulatorState&&) = delete;
-  CartesianRegulatorState& operator=(CartesianRegulatorState&&) = delete;
-
-  CartesianRegulatorState( ) = default;
-
-  CartesianRegulatorState(rosdyn::ChainInterfacePtr kin) : JointRegulatorState(kin)
-  {
-  }
-
-  CartesianRegulatorState(const rosdyn::ChainStateX& status) : JointRegulatorState(status)
-  {
-  }
-
-  virtual void setRobotState(const rosdyn::ChainStateX& status)
-  {
-    JointRegulatorState::setRobotState(status);
-    robot_state->updateTransformations();
-  }
-
-  virtual void setRobotState(rosdyn::ChainStateXConstPtr& status) override
-  {
-    JointRegulatorState::setRobotState(status);
-    robot_state->updateTransformations();
-  }
-};
-
-typedef CartesianRegulatorState::Ptr CartesianRegulatorStatePtr;
-typedef CartesianRegulatorState::ConstPtr CartesianRegulatorStateConstPtr;
+template<int N, int MaxN>
+using CartesianRegulatorStateConstPtr = typename CartesianRegulatorState<N,MaxN>::ConstPtr;
 
 
-}  // namespace cnr_regulator_interface
+}  // namespace control
+}  // namespace cnr
 
 #endif  // CNR_REGULATOR_INTERFACE__CNR_REGULATOR_STATE__H

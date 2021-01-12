@@ -1,5 +1,8 @@
 #include <cnr_regulator_interface/internal/cnr_regulator_base.h>
-namespace cnr_regulator_interface
+
+namespace cnr
+{
+namespace control
 {
 
 void get_resource_names(ros::NodeHandle* nh, std::vector<std::string>& names)
@@ -22,9 +25,9 @@ void get_resource_names(ros::NodeHandle* nh, std::vector<std::string>& names)
   return;
 }
 
-bool BaseRegulator::initialize(ros::NodeHandle& root_nh,
+bool BaseRegulator::initialize(ros::NodeHandle& /*root_nh*/,
                                ros::NodeHandle& controller_nh,
-                               cnr_regulator_interface::BaseRegulatorParamsPtr params)
+                               BaseRegulatorParamsPtr params)
 {
   if(!params)
   {
@@ -51,7 +54,7 @@ bool BaseRegulator::initialize(ros::NodeHandle& root_nh,
   CNR_RETURN_TRUE(p_->logger);
 }
 
-bool BaseRegulator::starting(cnr_regulator_interface::BaseRegulatorStateConstPtr state0, const ros::Time& time)
+bool BaseRegulator::starting(BaseRegulatorStateConstPtr state0, const ros::Time& /*time*/)
 {
   if(!state0)
   {
@@ -95,4 +98,5 @@ bool BaseRegulator::update( BaseRegulatorControlCommandPtr   u)
   return true;
 }
 
-}  // namespace cnr_regulator_interface
+}  // namespace control
+}  // namespace cnr

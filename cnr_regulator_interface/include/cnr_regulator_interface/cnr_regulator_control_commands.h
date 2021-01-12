@@ -1,116 +1,116 @@
 #ifndef CNR_REGULATOR_INTERFACE__CNR_REGULATOR_OUTPUTS__H
 #define CNR_REGULATOR_INTERFACE__CNR_REGULATOR_OUTPUTS__H
 
+#include <memory>
+#include <type_traits>
+
 #include <ros/time.h>
 #include <Eigen/Dense>
-#include <memory>
 
-namespace cnr_regulator_interface
+#include <eigen_state_space_systems/utils/operations.h>
+
+namespace eu = eigen_utils;
+
+namespace cnr
 {
-
+namespace control
+{
 
 /**
  * @brief The BaseRegulatorControlCommand struct
  */
 struct BaseRegulatorControlCommand
 {
-  BaseRegulatorControlCommand() = delete;
+  using Ptr      = std::shared_ptr<BaseRegulatorControlCommand>;
+  using ConstPtr = std::shared_ptr<BaseRegulatorControlCommand const>;
+
+  BaseRegulatorControlCommand() = default;
   virtual ~BaseRegulatorControlCommand() = default;
   BaseRegulatorControlCommand(const BaseRegulatorControlCommand&) = delete;
   BaseRegulatorControlCommand& operator=(const BaseRegulatorControlCommand&) = delete;
   BaseRegulatorControlCommand(BaseRegulatorControlCommand&&) = delete;
   BaseRegulatorControlCommand& operator=(BaseRegulatorControlCommand&&) = delete;
 
-  BaseRegulatorControlCommand(const size_t& sz) : dim(sz)
-  {
-    u.resize(dim);
-    u.setZero();
-  }
-  
-  void set_dimension(const size_t& n_dim) { dim = n_dim; u.resize(6 + n_dim); u.setZero();}
-  
-  size_t dim;
-  Eigen::VectorXd u;
+  ros::Duration time_from_start;
+  bool in_goal_tolerance;
+  bool in_path_tolerance;
+  double scaling;
 };
 
-typedef std::shared_ptr<BaseRegulatorControlCommand> BaseRegulatorControlCommandPtr;
-typedef std::shared_ptr<BaseRegulatorControlCommand const > BaseRegulatorControlCommandConstPtr;
+using BaseRegulatorControlCommandPtr = typename BaseRegulatorControlCommand::Ptr;
+using BaseRegulatorControlCommandConstNPtr = typename BaseRegulatorControlCommand::ConstPtr;
 
 /**
  * @brief The BaseRegulatorControlCommand struct
  */
-struct JointRegulatorControlCommand : public BaseRegulatorControlCommand
+
+template<int N, int MaxN=N>
+struct KinematicsRegulatorControlCommand : public BaseRegulatorControlCommand
 {
-  JointRegulatorControlCommand() = delete;
-  virtual ~JointRegulatorControlCommand() = default;
-  JointRegulatorControlCommand(const JointRegulatorControlCommand&) = delete;
-  JointRegulatorControlCommand& operator=(const JointRegulatorControlCommand&) = delete;
-  JointRegulatorControlCommand(JointRegulatorControlCommand&&) = delete;
-  JointRegulatorControlCommand& operator=(JointRegulatorControlCommand&&) = delete;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  JointRegulatorControlCommand(const size_t& nAx)
-    : BaseRegulatorControlCommand(4 + nAx*4)
-  {
-    dim = nAx;
-  }
-  virtual void set_time_from_start  (const ros::Duration& time_from_start) { u(0)= time_from_start.toSec()  ; }
-  virtual void set_in_goal_tolerance(const bool& in_goal_tolerance       ) { u(1)= in_goal_tolerance        ; }
-  virtual void set_in_path_tolerance(const bool& in_path_tolerance       ) { u(2)= in_path_tolerance        ; }
-  virtual void set_scaling          (const double& scaling               ) { u(3)= scaling                  ; }
-  virtual void set_q                (const Eigen::VectorXd& q            ) { u.segment(0*dim+4,dim) = q     ; }
-  virtual void set_qd               (const Eigen::VectorXd& qd           ) { u.segment(1*dim+4,dim) = qd    ; }
-  virtual void set_qdd              (const Eigen::VectorXd& qdd          ) { u.segment(2*dim+4,dim) = qdd   ; }
-  virtual void set_effort           (const Eigen::VectorXd& effort       ) { u.segment(3*dim+4,dim) = effort; }
+  enum {DimAtCompileTime = N, MaxDimAtCompileTime = MaxN};
 
-  virtual void set_q(const std::vector<double>& q)
+  using Value = typename std::conditional<N==1, double, Eigen::Matrix<double,N,1,Eigen::ColMajor,MaxN> >::type;
+  using Ptr = std::shared_ptr<KinematicsRegulatorControlCommand>;
+  using ConstPtr = std::shared_ptr<KinematicsRegulatorControlCommand const>;
+
+  Value x;
+  Value xd;
+  Value xdd;
+  Value eff;
+
+  void set_dimension(const int& dim)
   {
-    u.segment(0*dim+4,dim) = Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(&q[0],dim);
-  }
-  virtual void set_qd(const std::vector<double>& qd)
-  {
-    u.segment(1*dim+4,dim) = Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(&qd[0],dim);
-  }
-  virtual void set_qdd(const std::vector<double>& qdd)
-  {
-    u.segment(2*dim+4,dim) = Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(&qdd[0],dim);
-  }
-  virtual void set_effort(const std::vector<double>& effort)
-  {
-    u.segment(3*dim+4,dim) = Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(&effort[0],dim);
+    if(eu::rows(x)==1 && dim!=1) throw std::runtime_error("The command size is a scalar, and it cannot be resized.");
+    if(!eu::resize(x,dim))
+    {
+      throw std::runtime_error("The command is fixed-size, and it cannot be resized.");
+    }
+    eu::setZero(x);
+    eu::resize(xd,dim); eu::setZero(xd);
+    eu::resize(xdd,dim); eu::setZero(xdd);
+    eu::resize(eff,dim); eu::setZero(eff);
   }
 
-  virtual ros::Duration   get_time_from_start  ( ) const { return ros::Duration(u(0))  ;  }
-  virtual bool            get_in_goal_tolerance( ) const { return u(1); }
-  virtual bool            get_in_path_tolerance( ) const { return u(2); }
-  virtual double          get_scaling          ( ) const { return u(3); }
-  virtual Eigen::VectorXd get_q                ( ) const { return u.segment(0*dim+4,dim); }
-  virtual Eigen::VectorXd get_qd               ( ) const { return u.segment(1*dim+4,dim); }
-  virtual Eigen::VectorXd get_qdd              ( ) const { return u.segment(2*dim+4,dim); }
-  virtual Eigen::VectorXd get_effort           ( ) const { return u.segment(3*dim+4,dim); }
+  int dof() const {return eu::rows(x);}
+
+  KinematicsRegulatorControlCommand() = default;
+  virtual ~KinematicsRegulatorControlCommand() = default;
+  KinematicsRegulatorControlCommand(const KinematicsRegulatorControlCommand&) = delete;
+  KinematicsRegulatorControlCommand& operator=(const KinematicsRegulatorControlCommand&) = delete;
+  KinematicsRegulatorControlCommand(KinematicsRegulatorControlCommand&&) = delete;
+  KinematicsRegulatorControlCommand& operator=(KinematicsRegulatorControlCommand&&) = delete;
 };
 
-typedef std::shared_ptr<JointRegulatorControlCommand> JointRegulatorControlCommandPtr;
-typedef std::shared_ptr<JointRegulatorControlCommand const> JointRegulatorControlCommandConstPtr;
+template<int N, int MaxN=N>
+using KinematicsRegulatorControlCommandPtr = typename KinematicsRegulatorControlCommand<N,MaxN>::Ptr;
+
+template<int N, int MaxN=N>
+using KinematicsRegulatorControlCommandConstPtr = typename KinematicsRegulatorControlCommand<N,MaxN>::ConstPtr;
+
+
+/**
+ * @brief The JointRegulatorControlCommand struct
+ */
+template<int N, int MaxN=N>
+using JointRegulatorControlCommand = KinematicsRegulatorControlCommand<N,MaxN>;
+
+template<int N, int MaxN=N>
+using JointRegulatorControlCommandPtr = KinematicsRegulatorControlCommandPtr<N,MaxN>;
+
+template<int N, int MaxN=N>
+using JointRegulatorControlCommandConstPtr = KinematicsRegulatorControlCommandConstPtr<N,MaxN>;
+
 
 /**
  * @brief The CartesianRegulatorControlCommand struct
  */
-struct CartesianRegulatorControlCommand : public cnr_regulator_interface::JointRegulatorControlCommand
-{
-  CartesianRegulatorControlCommand(const size_t ndim = 6)
-    : JointRegulatorControlCommand(ndim)
-  {
-  }
-  virtual ~CartesianRegulatorControlCommand() = default;
-  CartesianRegulatorControlCommand(const CartesianRegulatorControlCommand&) = delete;
-  CartesianRegulatorControlCommand& operator=(const CartesianRegulatorControlCommand&) = delete;
-  CartesianRegulatorControlCommand(CartesianRegulatorControlCommand&&) = delete;
-  CartesianRegulatorControlCommand& operator=(CartesianRegulatorControlCommand&&) = delete;
-};
-typedef std::shared_ptr<CartesianRegulatorControlCommand> CartesianRegulatorControlCommandPtr;
-typedef std::shared_ptr<CartesianRegulatorControlCommand const> CartesianRegulatorControlCommandConstPtr;
+using CartesianRegulatorControlCommand         = KinematicsRegulatorControlCommand<6>;
+using CartesianRegulatorControlCommandPtr      = KinematicsRegulatorControlCommandPtr<6>;
+using CartesianRegulatorControlCommandConstPtr = KinematicsRegulatorControlCommandConstPtr<6>;
 
-
-}  // namespace cnr_regulator_interface
+}  // namespace control
+}  // namespace cnr
 
 #endif  // CNR_REGULATOR_INTERFACE__CNR_REGULATOR_OUTPUTS__H

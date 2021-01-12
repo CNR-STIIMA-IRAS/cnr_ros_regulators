@@ -7,10 +7,12 @@
 #include <rosdyn_utilities/chain_state.h>
 #include <cnr_regulator_interface/cnr_regulator_params.h>
 
-namespace cnr_impedance_regulator
+namespace cnr
+{
+namespace control
 {
 
-struct ImpedanceRegulatorParams : public cnr_regulator_interface::BaseRegulatorParams
+struct ImpedanceRegulatorParams : public BaseRegulatorParams
 {
   typedef std::shared_ptr<ImpedanceRegulatorParams> Ptr;
   typedef std::shared_ptr<ImpedanceRegulatorParams const> ConstPtr;
@@ -29,6 +31,7 @@ typedef ImpedanceRegulatorParams::Ptr ImpedanceRegulatorParamsPtr;
 typedef ImpedanceRegulatorParams::ConstPtr ImpedanceRegulatorParamsConstPtr;
 
 
-}  // namespace cnr_impedance_regulator
+}  // namespace control
+}  // namespace cnr
 
 #endif  // CNR_IMPEDANCE_REGULATOR_INTERFACE__CNR_IMPEDANCE_REGULATOR_OPTIONS__H
