@@ -7,7 +7,7 @@
 #include <ros/time.h>
 #include <Eigen/Dense>
 
-#include <eigen_state_space_systems/utils/operations.h>
+#include <eigen_matrix_utils/overloads.h>
 
 namespace eu = eigen_utils;
 

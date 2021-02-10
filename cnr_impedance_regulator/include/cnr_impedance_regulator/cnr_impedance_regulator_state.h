@@ -5,7 +5,7 @@
 #include <Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
 #include <rosdyn_utilities/chain_state.h>
-#include <eigen_state_space_systems/utils/operations.h>
+#include <eigen_matrix_utils/overloads.h>
 #include <cnr_regulator_interface/cnr_regulator_state.h>
 
 namespace eu = eigen_utils;
@@ -44,7 +44,7 @@ struct MassSpringDamperModel
 
   MassSpringDamperModel& operator=(const rosdyn::ChainState<N,MaxN>& status)
   {
-    set_dim(status.nAx());
+    set_dim(eigen_utils::rows(status.q()));
     x = status.q();
     xd = status.qd();
     xdd = status.qdd();
@@ -66,7 +66,7 @@ public:
   ImpedanceRegulatorState(ImpedanceRegulatorState&&) = delete;
   ImpedanceRegulatorState& operator=(ImpedanceRegulatorState&&) = delete;
   
-  ImpedanceRegulatorState(rosdyn::ChainInterfacePtr kin) : JointRegulatorState<N,MaxN>(kin) {}
+  ImpedanceRegulatorState(rosdyn::Chain& kin) : JointRegulatorState<N,MaxN>(kin) {}
   ImpedanceRegulatorState(const rosdyn::ChainState<N,MaxN>& status) : JointRegulatorState<N,MaxN>(status) {}
   ImpedanceRegulatorState& operator=(const ImpedanceRegulatorState& rhs)
   {

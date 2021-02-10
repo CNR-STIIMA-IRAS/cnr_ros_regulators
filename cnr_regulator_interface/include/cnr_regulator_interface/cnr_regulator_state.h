@@ -50,7 +50,7 @@ public:
   JointRegulatorState(JointRegulatorState&&) = delete;
   JointRegulatorState& operator=(JointRegulatorState&&) = delete;
 
-  JointRegulatorState(rosdyn::ChainInterfacePtr kin)
+  JointRegulatorState(rosdyn::Chain& kin)
     : robot_state(kin)
   {
   }
@@ -58,7 +58,7 @@ public:
   //! no update transform!
   JointRegulatorState& operator=(const JointRegulatorState& rhs)
   {
-    robot_state = rhs.robot_state;
+    robot_state.copy(rhs.robot_state, rhs.robot_state.ONLY_JOINT);
     return *this;
   }
 

@@ -35,7 +35,8 @@ struct BaseRegulatorParams
   cnr_logger::TraceLoggerPtr  logger;
   size_t                      dim;
   ros::Duration               period;
-  rosdyn::ChainInterfacePtr   robot_kin;
+  std::vector<std::string>    resources_names;
+  //rosdyn::ChainInterfacePtr   robot_kin;
   InterpolatorBasePtr         interpolator;
   
   BaseRegulatorParams& operator<<(const BaseRegulatorParams::ConstPtr& rhs)
@@ -43,7 +44,8 @@ struct BaseRegulatorParams
     this->logger = rhs->logger;
     this->dim = rhs->dim;
     this->period = rhs->period;
-    this->robot_kin = rhs->robot_kin;
+    this->resources_names = rhs->resources_names;
+    //this->robot_kin = rhs->robot_kin;
     this->interpolator = rhs->interpolator;
     return *this;
   }
@@ -53,12 +55,13 @@ struct BaseRegulatorParams
     this->logger = rhs.logger;
     this->dim = rhs.dim;
     this->period = rhs.period;
-    this->robot_kin = rhs.robot_kin;
+    this->resources_names = rhs.resources_names;
+    //this->robot_kin = rhs.robot_kin;
     this->interpolator = rhs.interpolator;
     return *this;
   }
   
-  const size_t& nAx() { return robot_kin->nAx(); }
+  //const size_t& nAx() { return robot_kin->nAx(); }
 };
 
 typedef BaseRegulatorParams::Ptr BaseRegulatorParamsPtr;

@@ -53,7 +53,7 @@ public:
   JointRegulatorFeedback(JointRegulatorFeedback&&) = delete;
   JointRegulatorFeedback& operator=(JointRegulatorFeedback&&) = delete;
 
-  JointRegulatorFeedback(rosdyn::ChainInterfacePtr kin)
+  JointRegulatorFeedback(const rosdyn::Chain& kin)
   {
     robot_state.init(kin);
   }
@@ -95,7 +95,7 @@ public:
   CartesianRegulatorFeedback& operator=(CartesianRegulatorFeedback&&) = delete;
 
   CartesianRegulatorFeedback( ) = default;
-  CartesianRegulatorFeedback(rosdyn::ChainInterfacePtr kin) : JointRegulatorFeedback<N,MaxN>(kin)
+  CartesianRegulatorFeedback(rosdyn::Chain& kin) : JointRegulatorFeedback<N,MaxN>(kin)
   {
   }
 

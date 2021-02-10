@@ -48,7 +48,7 @@ bool BaseRegulator::initialize(ros::NodeHandle& /*root_nh*/,
   if((controlled_resources_.size()==1)&&(controlled_resources_.front() == "all"))
   {
     controlled_resources_.clear();
-    controlled_resources_ = params->robot_kin->jointNames();
+    controlled_resources_ = params->resources_names;
   }
 
   CNR_RETURN_TRUE(p_->logger);

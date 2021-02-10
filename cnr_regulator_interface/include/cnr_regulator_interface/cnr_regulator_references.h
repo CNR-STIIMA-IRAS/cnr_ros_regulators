@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
 
-#include <eigen_state_space_systems/utils/operations.h>
+#include <eigen_matrix_utils/overloads.h>
 
 namespace eu = eigen_utils;
 

@@ -96,8 +96,8 @@ public:
   cnr_logger::TraceLoggerPtr     logger()        { return p_->logger;    }
   const size_t&                  dim   () const  { return p_->dim;       }
   const ros::Duration&           period() const  { return p_->period;    }
-  rosdyn::ChainInterfaceConstPtr kin   () const  { return p_->robot_kin; }
-  rosdyn::ChainInterfacePtr      kin   ()        { return p_->robot_kin; }
+//  rosdyn::ChainInterfaceConstPtr kin   () const  { return p_->robot_kin; }
+//  rosdyn::ChainInterfacePtr      kin   ()        { return p_->robot_kin; }
 
 protected:
 

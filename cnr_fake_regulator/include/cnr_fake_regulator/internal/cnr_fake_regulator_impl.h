@@ -3,7 +3,7 @@
 #ifndef CNR_FAKE_REGULATOR__CNR_FAKE_REGULATOR_IMPL__H
 #define CNR_FAKE_REGULATOR__CNR_FAKE_REGULATOR_IMPL__H
 
-#include <eigen_state_space_systems/utils/operations.h>
+#include <eigen_matrix_utils/overloads.h>
 #include <cnr_fake_regulator/cnr_fake_regulator.h>
 #include <cnr_interpolator_interface/cnr_interpolator_inputs.h>
 #include <cnr_interpolator_interface/cnr_interpolator_outputs.h>

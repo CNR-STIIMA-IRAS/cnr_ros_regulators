@@ -4,7 +4,7 @@
 #define CNR_IMPEDANCE_REGULATOR__CNR_IMPEDANCE_REGULATOR__H
 
 #include <rosparam_utilities/rosparam_utilities.h>
-#include <eigen_state_space_systems/utils/operations.h>
+#include <eigen_matrix_utils/overloads.h>
 #include <cnr_impedance_regulator/cnr_impedance_regulator.h>
 #include <cnr_interpolator_interface/cnr_interpolator_inputs.h>
 #include <cnr_interpolator_interface/cnr_interpolator_outputs.h>
