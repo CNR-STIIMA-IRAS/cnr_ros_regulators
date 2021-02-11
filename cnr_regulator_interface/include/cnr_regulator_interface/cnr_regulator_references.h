@@ -114,6 +114,9 @@ struct CartesianRegulatorReference : public BaseRegulatorReference
   Eigen::Vector6d     twist;
   Eigen::Vector6d     twistd;
 
+  Eigen::Vector6d     goal_tolerance;
+  Eigen::Vector6d     path_tolerance;
+
   void set_x(const Eigen::Affine3d& T)
   {
     q = Eigen::Quaterniond(T.linear());

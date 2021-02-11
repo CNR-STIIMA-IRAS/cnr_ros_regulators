@@ -36,7 +36,7 @@ struct BaseRegulatorParams
   size_t                      dim;
   ros::Duration               period;
   std::vector<std::string>    resources_names;
-  //rosdyn::ChainInterfacePtr   robot_kin;
+  rosdyn::Chain*              chain;
   InterpolatorBasePtr         interpolator;
   
   BaseRegulatorParams& operator<<(const BaseRegulatorParams::ConstPtr& rhs)
@@ -45,7 +45,7 @@ struct BaseRegulatorParams
     this->dim = rhs->dim;
     this->period = rhs->period;
     this->resources_names = rhs->resources_names;
-    //this->robot_kin = rhs->robot_kin;
+    this->chain = rhs->chain;
     this->interpolator = rhs->interpolator;
     return *this;
   }
@@ -56,7 +56,7 @@ struct BaseRegulatorParams
     this->dim = rhs.dim;
     this->period = rhs.period;
     this->resources_names = rhs.resources_names;
-    //this->robot_kin = rhs.robot_kin;
+    this->chain = rhs.chain;
     this->interpolator = rhs.interpolator;
     return *this;
   }

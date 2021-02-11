@@ -86,10 +86,10 @@ using JointRegulatorStateConstPtr = typename JointRegulatorState<N,MaxN>::ConstP
 template<int N, int MaxN=N>
 using CartesianRegulatorState = JointRegulatorState<N,MaxN>;
 
-template<int N, int MaxN>
+template<int N, int MaxN=N>
 using CartesianRegulatorStatePtr = typename CartesianRegulatorState<N,MaxN>::Ptr;
 
-template<int N, int MaxN>
+template<int N, int MaxN=N>
 using CartesianRegulatorStateConstPtr = typename CartesianRegulatorState<N,MaxN>::ConstPtr;
 
 

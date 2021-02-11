@@ -55,7 +55,9 @@ namespace cnr
 namespace control
 {
 
-
+/**
+ * @brief The BaseRegulator class
+ */
 class BaseRegulator
 {
 public:
@@ -96,11 +98,8 @@ public:
   cnr_logger::TraceLoggerPtr     logger()        { return p_->logger;    }
   const size_t&                  dim   () const  { return p_->dim;       }
   const ros::Duration&           period() const  { return p_->period;    }
-//  rosdyn::ChainInterfaceConstPtr kin   () const  { return p_->robot_kin; }
-//  rosdyn::ChainInterfacePtr      kin   ()        { return p_->robot_kin; }
 
 protected:
-
   ros::Duration                 regulator_time_;
   std::vector<std::string>      controlled_resources_;
   

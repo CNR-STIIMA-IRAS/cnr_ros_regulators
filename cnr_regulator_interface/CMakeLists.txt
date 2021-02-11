@@ -25,7 +25,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES cnr_regulator_interface
   CATKIN_DEPENDS cnr_logger roscpp pluginlib trajectory_msgs cnr_interpolator_interface cnr_interpolator_interface rosdyn_utilities
-  DEPENDS Eigen3
+  DEPENDS EIGEN3
 )
 
 ###########
