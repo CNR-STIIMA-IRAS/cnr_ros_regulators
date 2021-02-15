@@ -10,7 +10,7 @@ namespace control
 {
 
 template<int N, int MaxN=N>
-class FakeRegulatorN: public BaseJointRegulator<N,MaxN>
+class FakeRegulatorN: public BaseJointRegulatorN<N,MaxN>
 {
 public:
 

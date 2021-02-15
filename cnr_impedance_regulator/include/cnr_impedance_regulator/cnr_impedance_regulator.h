@@ -16,7 +16,7 @@ namespace control
 {
 
 template<int N, int MaxN=N>
-using BaseImpedanceRegulatorN = RegulatorInterface<BaseRegulatorParams,
+using BaseImpedanceRegulatorN = RegulatorInterfaceN<BaseRegulatorParams,
                                                   ImpedanceRegulatorState<N,MaxN>,
                                                   JointRegulatorReference<N,MaxN>,
                                                   JointRegulatorControlCommand<N,MaxN>,

@@ -23,7 +23,7 @@ inline bool FakeRegulatorN<N,MaxN>::initialize(ros::NodeHandle&            root_
                                ros::NodeHandle&            controller_nh, 
                                BaseRegulatorParamsPtr param)
 {
-  if(!BaseJointRegulator<N,MaxN>::initialize(root_nh,controller_nh,param))
+  if(!BaseJointRegulatorN<N,MaxN>::initialize(root_nh,controller_nh,param))
   {
     return false;
   }
@@ -34,7 +34,7 @@ template<int N,int MaxN>
 inline bool FakeRegulatorN<N,MaxN>::starting(BaseRegulatorStateConstPtr state0, const ros::Time& time)
 {
   CNR_TRACE_START(this->logger());
-  if(!BaseJointRegulator<N,MaxN>::starting(state0, time))
+  if(!BaseJointRegulatorN<N,MaxN>::starting(state0, time))
   {
     CNR_RETURN_FALSE(this->logger());
   }
@@ -47,7 +47,7 @@ inline bool FakeRegulatorN<N,MaxN>::update(BaseRegulatorReferenceConstPtr _r,
                            BaseRegulatorControlCommandPtr _u)
 {
   CNR_TRACE_START_THROTTLE_DEFAULT(this->logger());
-  if(!BaseJointRegulator<N,MaxN>::update(_r,_u))
+  if(!BaseJointRegulatorN<N,MaxN>::update(_r,_u))
   {
     CNR_RETURN_FALSE(this->logger());
   }
