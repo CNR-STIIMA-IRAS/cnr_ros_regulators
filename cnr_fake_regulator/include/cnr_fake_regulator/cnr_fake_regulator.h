@@ -9,17 +9,19 @@ namespace cnr
 namespace control
 {
 
-template<int N, int MaxN=N>
-class FakeRegulatorN: public BaseJointRegulatorN<N,MaxN>
+class FakeRegulator: public BaseJointRegulator
 {
 public:
+  typedef std::shared_ptr<FakeRegulator> Ptr;
+  typedef std::shared_ptr<FakeRegulator const> ConstPtr;
 
-  FakeRegulatorN() = default;
-  virtual ~FakeRegulatorN() = default;
-  FakeRegulatorN(const FakeRegulatorN&) = delete;
-  FakeRegulatorN& operator=(const FakeRegulatorN&) = delete;
-  FakeRegulatorN(FakeRegulatorN&&) = delete;
-  FakeRegulatorN& operator=(FakeRegulatorN&&) = delete;
+
+  FakeRegulator() = default;
+  virtual ~FakeRegulator() = default;
+  FakeRegulator(const FakeRegulator&) = delete;
+  FakeRegulator& operator=(const FakeRegulator&) = delete;
+  FakeRegulator(FakeRegulator&&) = delete;
+  FakeRegulator& operator=(FakeRegulator&&) = delete;
 
   virtual bool initialize(ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh, 
                           BaseRegulatorParamsPtr opts) override;
@@ -53,19 +55,9 @@ public:
 
 };
 
+using FakeRegulatorPtr = typename FakeRegulator::Ptr;
+using FakeRegulatorConstPtr = typename FakeRegulator::ConstPtr;
 
-template<int N, int MaxN>
-using FakeRegulatorNPtr = typename FakeRegulatorN<N,MaxN>::Ptr;
-
-template<int N, int MaxN>
-using FakeRegulatorNConstPtr = typename FakeRegulatorN<N,MaxN>::ConstPtr;
-
-
-using FakeRegulator  = FakeRegulatorN<-1, 20>;
-using FakeRegulator1 = FakeRegulatorN<1>;
-using FakeRegulator3 = FakeRegulatorN<3>;
-using FakeRegulator6 = FakeRegulatorN<6>;
-using FakeRegulator7 = FakeRegulatorN<7>;
 
 }  // namespace control
 }  // namespace cnr

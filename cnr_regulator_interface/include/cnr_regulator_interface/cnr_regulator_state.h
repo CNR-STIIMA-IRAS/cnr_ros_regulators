@@ -30,15 +30,14 @@ typedef std::shared_ptr<BaseRegulatorState const> BaseRegulatorStateConstPtr;
 /**
  * @brief JointRegulatorState
  */
-template<int N, int MaxN=N>
 class JointRegulatorState : public BaseRegulatorState
 {
 protected:
-  rosdyn::ChainState<N,MaxN> robot_state;
+  rosdyn::ChainState robot_state;
 
 public:
   typedef std::shared_ptr<JointRegulatorState> Ptr;
-  typedef std::shared_ptr<JointRegulatorState<N,MaxN> const> ConstPtr;
+  typedef std::shared_ptr<JointRegulatorState const> ConstPtr;
 
   JointRegulatorState() = default;
   virtual ~JointRegulatorState() = default;
@@ -62,35 +61,27 @@ public:
     return *this;
   }
 
-  rosdyn::ChainState<N,MaxN>& robotState()
+  rosdyn::ChainState& robotState()
   {
     return robot_state;
   }
 
-  const rosdyn::ChainState<N,MaxN>& robotState() const
+  const rosdyn::ChainState& robotState() const
   {
     return robot_state;
   }
 };
 
-template<int N, int MaxN=N>
-using JointRegulatorStatePtr = typename JointRegulatorState<N,MaxN>::Ptr;
-
-template<int N, int MaxN=N>
-using JointRegulatorStateConstPtr = typename JointRegulatorState<N,MaxN>::ConstPtr;
+using JointRegulatorStatePtr = typename JointRegulatorState::Ptr;
+using JointRegulatorStateConstPtr = typename JointRegulatorState::ConstPtr;
 
 
 /**
  * @brief The CartesianRegulatorState struct
  */
-template<int N, int MaxN=N>
-using CartesianRegulatorState = JointRegulatorState<N,MaxN>;
-
-template<int N, int MaxN=N>
-using CartesianRegulatorStatePtr = typename CartesianRegulatorState<N,MaxN>::Ptr;
-
-template<int N, int MaxN=N>
-using CartesianRegulatorStateConstPtr = typename CartesianRegulatorState<N,MaxN>::ConstPtr;
+using CartesianRegulatorState = JointRegulatorState;
+using CartesianRegulatorStatePtr = typename CartesianRegulatorState::Ptr;
+using CartesianRegulatorStateConstPtr = typename CartesianRegulatorState::ConstPtr;
 
 
 }  // namespace control

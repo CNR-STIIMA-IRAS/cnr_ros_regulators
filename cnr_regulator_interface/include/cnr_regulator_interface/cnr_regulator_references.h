@@ -5,8 +5,7 @@
 #include <type_traits>
 #include <ros/time.h>
 #include <Eigen/Dense>
-#include <rosdyn_core/spacevect_algebra.h>
-
+#include <rosdyn_utilities/chain_state.h>
 #include <eigen_matrix_utils/overloads.h>
 
 namespace eu = eigen_utils;
@@ -52,30 +51,24 @@ typedef BaseRegulatorReference::ConstPtr BaseRegulatorReferenceConstPtr;
 /**
  * @brief The JointRegulatorReference struct
  */
-template<int N, int MaxN=N>
 struct JointRegulatorReference : public BaseRegulatorReference
 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  enum {DimAtCompileTime = N, MaxDimAtCompileTime = MaxN };
-
-  using Value = typename std::conditional<N==1, double, Eigen::Matrix<double,N,1,Eigen::ColMajor,MaxN> >::type;
   using Ptr = std::shared_ptr<JointRegulatorReference>;
   using ConstPtr = std::shared_ptr<JointRegulatorReference const>;
 
-  Value q;
-  Value qd;
-  Value qdd;
-  Value effort;
-
-  Value goal_tolerance;
-  Value path_tolerance;
+  rosdyn::VectorXd q;
+  rosdyn::VectorXd qd;
+  rosdyn::VectorXd qdd;
+  rosdyn::VectorXd effort;
+  rosdyn::VectorXd goal_tolerance;
+  rosdyn::VectorXd path_tolerance;
 
   int dof() const {return eu::rows(q);}
 
   void set_dimension(const int& dim)
   {
-    if(eu::rows(q)==1 && dim!=1) throw std::runtime_error("The command size is a scalar, and it cannot be resized.");
     if(!eu::resize(q,dim))
     {
       throw std::runtime_error("The command is fixed-size, and it cannot be resized.");
@@ -93,11 +86,9 @@ struct JointRegulatorReference : public BaseRegulatorReference
   JointRegulatorReference& operator=(JointRegulatorReference&&) = delete;
 };
 
-template<int N, int MaxN=N>
-using JointRegulatorReferencePtr = typename JointRegulatorReference<N,MaxN>::Ptr ;
 
-template<int N, int MaxN=N>
-using JointRegulatorReferenceConstPtr = typename JointRegulatorReference<N,MaxN>::ConstPtr ;
+using JointRegulatorReferencePtr = typename JointRegulatorReference::Ptr;
+using JointRegulatorReferenceConstPtr = typename JointRegulatorReference::ConstPtr;
 
 /**
  * @brief The CartesianRegulatorReference struct

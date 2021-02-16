@@ -6,8 +6,8 @@
 
 #include <ros/time.h>
 #include <Eigen/Dense>
-
 #include <eigen_matrix_utils/overloads.h>
+#include <rosdyn_core/primitives.h>
 
 namespace eu = eigen_utils;
 
@@ -44,21 +44,18 @@ using BaseRegulatorControlCommandConstNPtr = typename BaseRegulatorControlComman
  * @brief The BaseRegulatorControlCommand struct
  */
 
-template<int N, int MaxN=N>
+template<typename Vector>
 struct KinematicsRegulatorControlCommand : public BaseRegulatorControlCommand
 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  enum {DimAtCompileTime = N, MaxDimAtCompileTime = MaxN};
-
-  using Value = typename std::conditional<N==1, double, Eigen::Matrix<double,N,1,Eigen::ColMajor,MaxN> >::type;
   using Ptr = std::shared_ptr<KinematicsRegulatorControlCommand>;
   using ConstPtr = std::shared_ptr<KinematicsRegulatorControlCommand const>;
 
-  Value x;
-  Value xd;
-  Value xdd;
-  Value eff;
+  Vector x;
+  Vector xd;
+  Vector xdd;
+  Vector eff;
 
   void set_dimension(const int& dim)
   {
@@ -83,32 +80,32 @@ struct KinematicsRegulatorControlCommand : public BaseRegulatorControlCommand
   KinematicsRegulatorControlCommand& operator=(KinematicsRegulatorControlCommand&&) = delete;
 };
 
-template<int N, int MaxN=N>
-using KinematicsRegulatorControlCommandPtr = typename KinematicsRegulatorControlCommand<N,MaxN>::Ptr;
+template <typename Vector>
+using KinematicsRegulatorControlCommandPtr = typename KinematicsRegulatorControlCommand<Vector>::Ptr;
 
-template<int N, int MaxN=N>
-using KinematicsRegulatorControlCommandConstPtr = typename KinematicsRegulatorControlCommand<N,MaxN>::ConstPtr;
+template <typename Vector>
+using KinematicsRegulatorControlCommandConstPtr = typename KinematicsRegulatorControlCommand<Vector>::ConstPtr;
 
 
 /**
  * @brief The JointRegulatorControlCommand struct
  */
-template<int N, int MaxN=N>
-using JointRegulatorControlCommand = KinematicsRegulatorControlCommand<N,MaxN>;
+//!
+using JointRegulatorControlCommand = KinematicsRegulatorControlCommand<rosdyn::VectorXd>;
 
-template<int N, int MaxN=N>
-using JointRegulatorControlCommandPtr = KinematicsRegulatorControlCommandPtr<N,MaxN>;
+//!
+using JointRegulatorControlCommandPtr = KinematicsRegulatorControlCommandPtr<rosdyn::VectorXd>;
 
-template<int N, int MaxN=N>
-using JointRegulatorControlCommandConstPtr = KinematicsRegulatorControlCommandConstPtr<N,MaxN>;
+//!
+using JointRegulatorControlCommandConstPtr = KinematicsRegulatorControlCommandConstPtr<rosdyn::VectorXd>;
 
 
 /**
  * @brief The CartesianRegulatorControlCommand struct
  */
-using CartesianRegulatorControlCommand         = KinematicsRegulatorControlCommand<6>;
-using CartesianRegulatorControlCommandPtr      = KinematicsRegulatorControlCommandPtr<6>;
-using CartesianRegulatorControlCommandConstPtr = KinematicsRegulatorControlCommandConstPtr<6>;
+using CartesianRegulatorControlCommand         = KinematicsRegulatorControlCommand<Eigen::Vector6d>;
+using CartesianRegulatorControlCommandPtr      = KinematicsRegulatorControlCommandPtr<Eigen::Vector6d>;
+using CartesianRegulatorControlCommandConstPtr = KinematicsRegulatorControlCommandConstPtr<Eigen::Vector6d>;
 
 }  // namespace control
 }  // namespace cnr

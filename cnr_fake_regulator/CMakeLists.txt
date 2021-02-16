@@ -30,7 +30,7 @@ include_directories(include  ${catkin_INCLUDE_DIRS})
 ## Declare a C++ library
 add_library(${PROJECT_NAME} src/${PROJECT_NAME}/cnr_fake_regulator.cpp)
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall -faligned-new
-        $<$<CONFIG:Release>:-Ofast -funroll-loops -ffast-math -march=native -mavx -mfma>)
+        $<$<CONFIG:Release>:-Ofast -funroll-loops -ffast-math >)
 
 #############
 ## Install ##

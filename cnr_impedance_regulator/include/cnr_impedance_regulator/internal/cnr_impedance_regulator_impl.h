@@ -16,12 +16,12 @@ namespace cnr
 namespace control
 {
 
-template<int N, int MaxN>
-inline bool ImpedanceRegulatorN<N,MaxN>::initialize(ros::NodeHandle&  root_nh,
+//!
+inline bool ImpedanceRegulator::initialize(ros::NodeHandle&  root_nh,
                                     ros::NodeHandle&  controller_nh,
                                     cnr::control::BaseRegulatorParamsPtr opts)
 {
-  if(!this->BaseImpedanceRegulatorN<N,MaxN>::initialize(root_nh,controller_nh,opts))
+  if(!this->BaseImpedanceRegulator::initialize(root_nh,controller_nh,opts))
   {
     return false;
   }
@@ -123,27 +123,27 @@ inline bool ImpedanceRegulatorN<N,MaxN>::initialize(ros::NodeHandle&  root_nh,
   CNR_RETURN_TRUE(this->logger());
 }
 
-template<int N, int MaxN>
-inline bool ImpedanceRegulatorN<N,MaxN>::starting(cnr::control::BaseRegulatorStateConstPtr state0, const ros::Time& time)
+//!
+inline bool ImpedanceRegulator::starting(cnr::control::BaseRegulatorStateConstPtr state0, const ros::Time& time)
 {
-  if(!this->BaseImpedanceRegulatorN<N,MaxN>::starting(state0, time))
+  if(!this->BaseImpedanceRegulator::starting(state0, time))
   {
     CNR_RETURN_FALSE(this->logger());
   }
   CNR_RETURN_TRUE(this->logger());
 }
 
-template<int N, int MaxN>
-inline bool ImpedanceRegulatorN<N,MaxN>::update(cnr::control::BaseRegulatorReferenceConstPtr _r,
+//!
+inline bool ImpedanceRegulator::update(cnr::control::BaseRegulatorReferenceConstPtr _r,
                                 cnr::control::BaseRegulatorControlCommandPtr _u)
 {
-  if(!BaseImpedanceRegulatorN<N,MaxN>::update(_r, _u))
+  if(!BaseImpedanceRegulator::update(_r, _u))
   {
     CNR_RETURN_FALSE(this->logger());
   }
 
   // refernece - alias
-  MassSpringDamperModel<N,MaxN>& msd = this->x()->msdState(); //mass spring damper model
+  MassSpringDamperModel& msd = this->x()->msdState(); //mass spring damper model
 
   msd.xdd = m_Jinv * ( m_k * (this->r()->q - msd.x)
           + m_damping * (this->r()->qd - msd.xd) + this->r()->effort);

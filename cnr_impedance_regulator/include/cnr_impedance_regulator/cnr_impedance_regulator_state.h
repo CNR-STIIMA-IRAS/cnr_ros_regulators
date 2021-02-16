@@ -15,15 +15,12 @@ namespace cnr
 namespace control
 {
 
-template<int N, int MaxN>
 struct MassSpringDamperModel
 {
-  using Value = typename std::conditional<N==1,double, Eigen::Matrix<double,N,1,Eigen::ColMajor,MaxN> >::type;
-
-  Value x;
-  Value xd;
-  Value xdd;
-  Value effort;
+  rosdyn::VectorXd x;
+  rosdyn::VectorXd xd;
+  rosdyn::VectorXd xdd;
+  rosdyn::VectorXd effort;
 
   void set_dim(const size_t& dim)
   {
@@ -42,7 +39,7 @@ struct MassSpringDamperModel
     return *this;
   }
 
-  MassSpringDamperModel& operator=(const rosdyn::ChainState<N,MaxN>& status)
+  MassSpringDamperModel& operator=(const rosdyn::ChainState& status)
   {
     set_dim(eigen_utils::rows(status.q()));
     x = status.q();
@@ -53,8 +50,8 @@ struct MassSpringDamperModel
   }
 };
 
-template<int N, int MaxN>
-class ImpedanceRegulatorState : public JointRegulatorState<N,MaxN>
+//!
+class ImpedanceRegulatorState : public JointRegulatorState
 {
 public:
   typedef std::shared_ptr<ImpedanceRegulatorState> Ptr;
@@ -66,8 +63,7 @@ public:
   ImpedanceRegulatorState(ImpedanceRegulatorState&&) = delete;
   ImpedanceRegulatorState& operator=(ImpedanceRegulatorState&&) = delete;
   
-  ImpedanceRegulatorState(rosdyn::Chain& kin) : JointRegulatorState<N,MaxN>(kin) {}
-  ImpedanceRegulatorState(const rosdyn::ChainState<N,MaxN>& status) : JointRegulatorState<N,MaxN>(status) {}
+  ImpedanceRegulatorState(rosdyn::Chain& kin) : JointRegulatorState(kin) {}
   ImpedanceRegulatorState& operator=(const ImpedanceRegulatorState& rhs)
   {
      msd.set_dim(eu::rows(rhs.msd.x));
@@ -75,27 +71,26 @@ public:
      return *this;
   }
 
-
-  MassSpringDamperModel<N,MaxN>& msdState()
+  MassSpringDamperModel& msdState()
   {
     return msd;
   }
 
-  const MassSpringDamperModel<N,MaxN>& msdState() const
+  const MassSpringDamperModel& msdState() const
   {
     return msd;
   }
 
 protected:
-  MassSpringDamperModel<N,MaxN> msd;
+  MassSpringDamperModel msd;
 
 };
 
-template<int N, int MaxN>
-using ImpedanceRegulatorStatePtr = typename ImpedanceRegulatorState<N,MaxN>::Ptr;
+//!
+using ImpedanceRegulatorStatePtr = typename ImpedanceRegulatorState::Ptr;
 
-template<int N, int MaxN>
-using ImpedanceRegulatorStateConstPtr = typename ImpedanceRegulatorState<N,MaxN>::ConstPtr;
+//!
+using ImpedanceRegulatorStateConstPtr = typename ImpedanceRegulatorState::ConstPtr;
 
 
 }  // namespace control

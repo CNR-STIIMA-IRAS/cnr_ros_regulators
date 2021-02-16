@@ -7,7 +7,3 @@
 #include <pluginlib/class_list_macros.h> 
 
 PLUGINLIB_EXPORT_CLASS(cnr::control::FakeRegulator , cnr::control::BaseRegulator)
-PLUGINLIB_EXPORT_CLASS(cnr::control::FakeRegulator1, cnr::control::BaseRegulator)
-PLUGINLIB_EXPORT_CLASS(cnr::control::FakeRegulator3, cnr::control::BaseRegulator)
-PLUGINLIB_EXPORT_CLASS(cnr::control::FakeRegulator6, cnr::control::BaseRegulator)
-PLUGINLIB_EXPORT_CLASS(cnr::control::FakeRegulator7, cnr::control::BaseRegulator)

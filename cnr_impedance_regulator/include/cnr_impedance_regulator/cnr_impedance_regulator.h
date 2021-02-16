@@ -15,26 +15,26 @@ namespace cnr
 namespace control
 {
 
-template<int N, int MaxN=N>
-using BaseImpedanceRegulatorN = RegulatorInterfaceN<BaseRegulatorParams,
-                                                  ImpedanceRegulatorState<N,MaxN>,
-                                                  JointRegulatorReference<N,MaxN>,
-                                                  JointRegulatorControlCommand<N,MaxN>,
-                                                  JointRegulatorFeedback<N,MaxN> >;
+//!
+using BaseImpedanceRegulator = RegulatorInterface<BaseRegulatorParams,
+                                                  ImpedanceRegulatorState,
+                                                  JointRegulatorReference,
+                                                  JointRegulatorControlCommand,
+                                                  JointRegulatorFeedback >;
 
-template<int N, int MaxN=N>
-class ImpedanceRegulatorN : public BaseImpedanceRegulatorN<N,MaxN>
+//!
+class ImpedanceRegulator : public BaseImpedanceRegulator
 {
 public:
-  typedef std::shared_ptr<ImpedanceRegulatorN> Ptr;
-  typedef std::shared_ptr<ImpedanceRegulatorN const > ConstPtr;
+  typedef std::shared_ptr<ImpedanceRegulator> Ptr;
+  typedef std::shared_ptr<ImpedanceRegulator const > ConstPtr;
 
-  ImpedanceRegulatorN() = default;
-  virtual ~ImpedanceRegulatorN() = default;
-  ImpedanceRegulatorN(const ImpedanceRegulatorN&) = delete;
-  ImpedanceRegulatorN& operator=(const ImpedanceRegulatorN&) = delete;
-  ImpedanceRegulatorN(ImpedanceRegulatorN&&) = delete;
-  ImpedanceRegulatorN& operator=(ImpedanceRegulatorN&&) = delete;
+  ImpedanceRegulator() = default;
+  virtual ~ImpedanceRegulator() = default;
+  ImpedanceRegulator(const ImpedanceRegulator&) = delete;
+  ImpedanceRegulator& operator=(const ImpedanceRegulator&) = delete;
+  ImpedanceRegulator(ImpedanceRegulator&&) = delete;
+  ImpedanceRegulator& operator=(ImpedanceRegulator&&) = delete;
 
   virtual bool initialize(ros::NodeHandle&   root_nh,
                           ros::NodeHandle&   controller_nh,
@@ -47,27 +47,17 @@ public:
 
   
 private:
-  using MatrixN = typename std::conditional<N==1, double, Eigen::Matrix<double,N,N,Eigen::ColMajor,MaxN,MaxN> >::type;
-  MatrixN m_Jinv;
-  MatrixN m_damping;
-  MatrixN m_damping_dafault;
-  MatrixN m_k;
-  MatrixN m_k_default;
-  MatrixN m_k_new;
+  rosdyn::MatrixXd m_Jinv;
+  rosdyn::MatrixXd m_damping;
+  rosdyn::MatrixXd m_damping_dafault;
+  rosdyn::MatrixXd m_k;
+  rosdyn::MatrixXd m_k_default;
+  rosdyn::MatrixXd m_k_new;
 };
 
-template<int N, int MaxN>
-using ImpedanceRegulatorNPtr = typename ImpedanceRegulatorN<N,MaxN>::Ptr;
+using ImpedanceRegulatorPtr = typename ImpedanceRegulator::Ptr;
+using ImpedanceRegulatorConstPtr = typename ImpedanceRegulator::ConstPtr;
 
-template<int N, int MaxN>
-using ImpedanceRegulatorNConstPtr = typename ImpedanceRegulatorN<N,MaxN>::ConstPtr;
-
-
-using ImpedanceRegulator = ImpedanceRegulatorN<-1, 20>;
-using ImpedanceRegulator1 = ImpedanceRegulatorN<1>;
-using ImpedanceRegulator3 = ImpedanceRegulatorN<3>;
-using ImpedanceRegulator6 = ImpedanceRegulatorN<6>;
-using ImpedanceRegulator7 = ImpedanceRegulatorN<7>;
 
 }  // namespace control
 }  // namespace cnr

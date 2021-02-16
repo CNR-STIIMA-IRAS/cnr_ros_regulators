@@ -58,15 +58,15 @@ constexpr int max_dof = MAX_NUM_AXES;
 
 
 template< class P, class X, class R, class U, class Y>
-class RegulatorInterfaceN : public BaseRegulator
+class RegulatorInterface : public BaseRegulator
 {
 public:
-  RegulatorInterfaceN() = default;
-  virtual ~RegulatorInterfaceN() = default;
-  RegulatorInterfaceN(const RegulatorInterfaceN&) = delete;
-  RegulatorInterfaceN& operator=(const RegulatorInterfaceN&) = delete;
-  RegulatorInterfaceN(RegulatorInterfaceN&&) = delete;
-  RegulatorInterfaceN& operator=(RegulatorInterfaceN&&) = delete;
+  RegulatorInterface() = default;
+  virtual ~RegulatorInterface() = default;
+  RegulatorInterface(const RegulatorInterface&) = delete;
+  RegulatorInterface& operator=(const RegulatorInterface&) = delete;
+  RegulatorInterface(RegulatorInterface&&) = delete;
+  RegulatorInterface& operator=(RegulatorInterface&&) = delete;
 
   virtual bool initialize(ros::NodeHandle&  root_nh,
                           ros::NodeHandle& controller_nh,
@@ -109,57 +109,40 @@ protected:
 };
 
 
-template<int N,int MaxN=N>
-using __BaseJointRegulatorN = RegulatorInterfaceN<JointRegulatorParams, JointRegulatorState<N,MaxN>,
-                                JointRegulatorReference<N,MaxN>, JointRegulatorControlCommand<N,MaxN>,
-                                  JointRegulatorFeedback<N,MaxN> >;
+using __BaseJointRegulator = RegulatorInterface<JointRegulatorParams, JointRegulatorState,
+                                JointRegulatorReference, JointRegulatorControlCommand,
+                                  JointRegulatorFeedback >;
 
-template<int N, int MaxN=N>
-class BaseJointRegulatorN : public __BaseJointRegulatorN<N,MaxN>
+class BaseJointRegulator : public __BaseJointRegulator
 {
 public:
-  BaseJointRegulatorN() = default;
-  virtual ~BaseJointRegulatorN() = default;
-  BaseJointRegulatorN(const BaseJointRegulatorN&) = delete;
-  BaseJointRegulatorN& operator=(const BaseJointRegulatorN&) = delete;
-  BaseJointRegulatorN(BaseJointRegulatorN&&) = delete;
-  BaseJointRegulatorN& operator=(BaseJointRegulatorN&&) = delete;
+  BaseJointRegulator() = default;
+  virtual ~BaseJointRegulator() = default;
+  BaseJointRegulator(const BaseJointRegulator&) = delete;
+  BaseJointRegulator& operator=(const BaseJointRegulator&) = delete;
+  BaseJointRegulator(BaseJointRegulator&&) = delete;
+  BaseJointRegulator& operator=(BaseJointRegulator&&) = delete;
 
   bool starting(BaseRegulatorStateConstPtr state0, const ros::Time& time) override;
 };
 
-using BaseJointRegulator  = BaseJointRegulatorN<-1, cnr::control::max_dof>;
-using BaseJointRegulator1 = BaseJointRegulatorN<1>;
-using BaseJointRegulator3 = BaseJointRegulatorN<3>;
-using BaseJointRegulator6 = BaseJointRegulatorN<6>;
-using BaseJointRegulator7 = BaseJointRegulatorN<7>;
-
-template<int N,int MaxN=N>
-using __BaseCartesianRegulatorN = RegulatorInterfaceN<CartesianRegulatorParams,
-                                                    CartesianRegulatorState<N,MaxN>, // depends on ChainState
-                                                    CartesianRegulatorReference,
-                                                    JointRegulatorControlCommand<N,MaxN>,
-                                                    JointRegulatorFeedback<N,MaxN> >;
-
-template<int N,int MaxN=N>
-class BaseCartesianRegulatorN : public  __BaseCartesianRegulatorN<N,MaxN>
+/**
+ * @brief The BaseCartesianRegulator class
+ */
+class BaseCartesianRegulator :
+    public RegulatorInterface<CartesianRegulatorParams, CartesianRegulatorState, CartesianRegulatorReference,
+                                JointRegulatorControlCommand, JointRegulatorFeedback>
 {
 public:
-  BaseCartesianRegulatorN() = default;
-  virtual ~BaseCartesianRegulatorN() = default;
-  BaseCartesianRegulatorN(const BaseCartesianRegulatorN&) = delete;
-  BaseCartesianRegulatorN& operator=(const BaseCartesianRegulatorN&) = delete;
-  BaseCartesianRegulatorN(BaseCartesianRegulatorN&&) = delete;
-  BaseCartesianRegulatorN& operator=(BaseCartesianRegulatorN&&) = delete;
+  BaseCartesianRegulator() = default;
+  virtual ~BaseCartesianRegulator() = default;
+  BaseCartesianRegulator(const BaseCartesianRegulator&) = delete;
+  BaseCartesianRegulator& operator=(const BaseCartesianRegulator&) = delete;
+  BaseCartesianRegulator(BaseCartesianRegulator&&) = delete;
+  BaseCartesianRegulator& operator=(BaseCartesianRegulator&&) = delete;
 
   bool starting(BaseRegulatorStateConstPtr state0, const ros::Time& time) override;
 };
-
-using BaseCartesianRegulator  = BaseCartesianRegulatorN<-1, cnr::control::max_dof>;
-using BaseCartesianRegulator1 = BaseCartesianRegulatorN<1>;
-using BaseCartesianRegulator3 = BaseCartesianRegulatorN<3>;
-using BaseCartesianRegulator6 = BaseCartesianRegulatorN<6>;
-using BaseCartesianRegulator7 = BaseCartesianRegulatorN<7>;
 
 }
 }

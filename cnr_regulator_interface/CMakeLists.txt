@@ -48,7 +48,7 @@ add_library(${PROJECT_NAME} src/${PROJECT_NAME}/cnr_regulator_base.cpp)
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} Eigen3::Eigen)
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall -faligned-new 
-        $<$<CONFIG:Release>:-Ofast -funroll-loops -ffast-math -march=native -mavx -mfma>)
+        $<$<CONFIG:Release>:-Ofast -funroll-loops -ffast-math >)
 
 # Mark cpp header files for installation
  install(DIRECTORY include/${PROJECT_NAME}/

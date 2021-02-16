@@ -35,11 +35,10 @@ typedef BaseRegulatorFeedback::ConstPtr BaseRegulatorFeedbackConstPtr;
 /**
  * @brief JointRegulatorFeedback
  */
-template<int N, int MaxN=N>
 class JointRegulatorFeedback : public BaseRegulatorFeedback
 {
 protected:
-  rosdyn::ChainState<N,MaxN> robot_state;
+  rosdyn::ChainState robot_state;
   
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -53,34 +52,30 @@ public:
   JointRegulatorFeedback(JointRegulatorFeedback&&) = delete;
   JointRegulatorFeedback& operator=(JointRegulatorFeedback&&) = delete;
 
-  JointRegulatorFeedback(const rosdyn::Chain& kin)
+  JointRegulatorFeedback(rosdyn::Chain& kin)
   {
     robot_state.init(kin);
   }
 
-  rosdyn::ChainState<N,MaxN>& robotState()
+  rosdyn::ChainState& robotState()
   {
     return robot_state;
   }
 
-  const rosdyn::ChainState<N,MaxN>& robotState() const
+  const rosdyn::ChainState& robotState() const
   {
     return robot_state;
   }
 };
 
-template<int N, int MaxN=N>
-using JointRegulatorFeedbackPtr = typename JointRegulatorFeedback<N,MaxN>::Ptr;
-
-template<int N, int MaxN=N>
-using JointRegulatorFeedbackConstPtr = typename JointRegulatorFeedback<N,MaxN>::ConstPtr;
+using JointRegulatorFeedbackPtr = typename JointRegulatorFeedback::Ptr;
+using JointRegulatorFeedbackConstPtr = typename JointRegulatorFeedback::ConstPtr;
 
 
 /**
  * @brief The CartesianRegulatorFeedback struct
  */
-template<int N,int MaxN>
-struct CartesianRegulatorFeedback : public JointRegulatorFeedback<N,MaxN>
+struct CartesianRegulatorFeedback : public JointRegulatorFeedback
 { 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -95,20 +90,13 @@ public:
   CartesianRegulatorFeedback& operator=(CartesianRegulatorFeedback&&) = delete;
 
   CartesianRegulatorFeedback( ) = default;
-  CartesianRegulatorFeedback(rosdyn::Chain& kin) : JointRegulatorFeedback<N,MaxN>(kin)
-  {
-  }
-
-  CartesianRegulatorFeedback(const rosdyn::ChainState<N,MaxN>& status) : JointRegulatorFeedback<N,MaxN>(status)
+  CartesianRegulatorFeedback(rosdyn::Chain& kin) : JointRegulatorFeedback(kin)
   {
   }
 };
 
-template<int N, int MaxN=N>
-using CartesianRegulatorFeedbackPtr = typename CartesianRegulatorFeedback<N,MaxN>::Ptr;
-
-template<int N, int MaxN=N>
-using CartesianRegulatorFeedbackConstPtr = typename CartesianRegulatorFeedback<N,MaxN>::ConstPtr;
+using CartesianRegulatorFeedbackPtr = typename CartesianRegulatorFeedback::Ptr;
+using CartesianRegulatorFeedbackConstPtr = typename CartesianRegulatorFeedback::ConstPtr;
 
 
 }  // namespace control

@@ -18,7 +18,7 @@ namespace control
 {
 
 template<class P, class X, class R, class U, class Y>
-inline bool RegulatorInterfaceN<P,X,R,U,Y>::initialize(
+inline bool RegulatorInterface<P,X,R,U,Y>::initialize(
     ros::NodeHandle&  root_nh, ros::NodeHandle& controller_nh, BaseRegulatorParamsPtr opts)
 {
   if(!BaseRegulator::initialize(root_nh,controller_nh, opts))
@@ -36,7 +36,7 @@ inline bool RegulatorInterfaceN<P,X,R,U,Y>::initialize(
 }
 
 template<class P, class X, class R, class U, class Y>
-inline bool RegulatorInterfaceN<P,X,R,U,Y>::starting(BaseRegulatorStateConstPtr x0, const ros::Time& time)
+inline bool RegulatorInterface<P,X,R,U,Y>::starting(BaseRegulatorStateConstPtr x0, const ros::Time& time)
 {
   CNR_TRACE_START(this->logger());
   std::shared_ptr<X const> _x0 = std::dynamic_pointer_cast<X const>(x0);
@@ -55,7 +55,7 @@ inline bool RegulatorInterfaceN<P,X,R,U,Y>::starting(BaseRegulatorStateConstPtr 
 }
 
 template<class P, class X, class R, class U, class Y>
-inline bool RegulatorInterfaceN<P,X,R,U,Y>::update(
+inline bool RegulatorInterface<P,X,R,U,Y>::update(
       BaseRegulatorReferenceConstPtr   r,
       BaseRegulatorFeedbackConstPtr    y,
       BaseRegulatorControlCommandPtr   u)
@@ -76,7 +76,7 @@ inline bool RegulatorInterfaceN<P,X,R,U,Y>::update(
 }
 
 template<class P, class X, class R, class U, class Y>
-inline bool RegulatorInterfaceN<P,X,R,U,Y>::update(BaseRegulatorReferenceConstPtr r, BaseRegulatorControlCommandPtr u)
+inline bool RegulatorInterface<P,X,R,U,Y>::update(BaseRegulatorReferenceConstPtr r, BaseRegulatorControlCommandPtr u)
 {
   CNR_TRACE_START_THROTTLE_DEFAULT(this->logger());
   auto _r = get(r);
@@ -93,7 +93,7 @@ inline bool RegulatorInterfaceN<P,X,R,U,Y>::update(BaseRegulatorReferenceConstPt
 }
 
 template<class P, class X, class R, class U, class Y>
-inline bool RegulatorInterfaceN<P,X,R,U,Y>::update(BaseRegulatorFeedbackConstPtr   y,
+inline bool RegulatorInterface<P,X,R,U,Y>::update(BaseRegulatorFeedbackConstPtr   y,
                       BaseRegulatorControlCommandPtr  u)
 {
   CNR_TRACE_START_THROTTLE_DEFAULT(this->logger());
@@ -111,7 +111,7 @@ inline bool RegulatorInterfaceN<P,X,R,U,Y>::update(BaseRegulatorFeedbackConstPtr
 }
 
 template<class P, class X, class R, class U, class Y>
-inline bool RegulatorInterfaceN<P,X,R,U,Y>::update(BaseRegulatorControlCommandPtr  u)
+inline bool RegulatorInterface<P,X,R,U,Y>::update(BaseRegulatorControlCommandPtr  u)
 {
   CNR_TRACE_START_THROTTLE_DEFAULT(this->logger());
   auto _u = get(u);
@@ -127,7 +127,7 @@ inline bool RegulatorInterfaceN<P,X,R,U,Y>::update(BaseRegulatorControlCommandPt
 }
 
 template<class P, class X, class R, class U, class Y>
-inline bool RegulatorInterfaceN<P,X,R,U,Y>::stopping(const ros::Time& time)
+inline bool RegulatorInterface<P,X,R,U,Y>::stopping(const ros::Time& time)
 {
   CNR_TRACE_START(this->logger());
   if(!BaseRegulator::stopping(time))
@@ -139,7 +139,7 @@ inline bool RegulatorInterfaceN<P,X,R,U,Y>::stopping(const ros::Time& time)
 
 
 template<class P, class X, class R, class U, class Y>
-inline std::shared_ptr<R const > RegulatorInterfaceN<P,X,R,U,Y>::get(BaseRegulatorReferenceConstPtr r)
+inline std::shared_ptr<R const > RegulatorInterface<P,X,R,U,Y>::get(BaseRegulatorReferenceConstPtr r)
 {
   std::shared_ptr<R const > _r = std::dynamic_pointer_cast<R const>(r);
   if(!_r)
@@ -151,7 +151,7 @@ inline std::shared_ptr<R const > RegulatorInterfaceN<P,X,R,U,Y>::get(BaseRegulat
 
 
 template<class P, class X, class R, class U, class Y>
-inline std::shared_ptr<Y const> RegulatorInterfaceN<P,X,R,U,Y>::get(BaseRegulatorFeedbackConstPtr y)
+inline std::shared_ptr<Y const> RegulatorInterface<P,X,R,U,Y>::get(BaseRegulatorFeedbackConstPtr y)
 {
   std::shared_ptr<Y const > _y = std::dynamic_pointer_cast<Y const>(y);
   if(!_y)
@@ -162,7 +162,7 @@ inline std::shared_ptr<Y const> RegulatorInterfaceN<P,X,R,U,Y>::get(BaseRegulato
 }
 
 template<class P, class X, class R, class U, class Y>
-inline std::shared_ptr<U>  RegulatorInterfaceN<P,X,R,U,Y>::get(BaseRegulatorControlCommandPtr u)
+inline std::shared_ptr<U>  RegulatorInterface<P,X,R,U,Y>::get(BaseRegulatorControlCommandPtr u)
 {
   std::shared_ptr<U> _u = std::dynamic_pointer_cast<U>(u);
   if(!_u)
@@ -174,11 +174,11 @@ inline std::shared_ptr<U>  RegulatorInterfaceN<P,X,R,U,Y>::get(BaseRegulatorCont
 
 
 
-template<int N, int MaxN>
-inline bool BaseJointRegulatorN<N,MaxN>::starting(BaseRegulatorStateConstPtr state0, const ros::Time& time)
+//!
+inline bool BaseJointRegulator::starting(BaseRegulatorStateConstPtr state0, const ros::Time& time)
 {
   CNR_TRACE_START(this->logger());
-  if(!this->__BaseJointRegulatorN<N,MaxN>::starting(state0, time))
+  if(!this->__BaseJointRegulator::starting(state0, time))
   {
     CNR_RETURN_FALSE(this->logger());
   }
@@ -187,11 +187,12 @@ inline bool BaseJointRegulatorN<N,MaxN>::starting(BaseRegulatorStateConstPtr sta
 
 
 
-template<int N, int MaxN>
-inline bool BaseCartesianRegulatorN<N,MaxN>::starting(BaseRegulatorStateConstPtr state0, const ros::Time& time)
+//!
+inline bool BaseCartesianRegulator::starting(BaseRegulatorStateConstPtr state0, const ros::Time& time)
 {
   CNR_TRACE_START(this->logger());
-  if(!this->__BaseCartesianRegulatorN<N, MaxN>::starting(state0, time))
+  if(!RegulatorInterface<CartesianRegulatorParams,CartesianRegulatorState,CartesianRegulatorReference,
+                            JointRegulatorControlCommand, JointRegulatorFeedback>::starting(state0, time))
   {
     CNR_RETURN_FALSE(this->logger());
   }
