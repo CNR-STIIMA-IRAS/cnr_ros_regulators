@@ -4,7 +4,7 @@
 #include <memory>
 #include <Eigen/Dense>
 #include <rosdyn_core/spacevect_algebra.h>
-#include <rosdyn_utilities/chain_state.h>
+#include <rosdyn_chain_state/chain_state.h>
 
 namespace cnr
 {

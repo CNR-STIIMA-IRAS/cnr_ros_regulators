@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <ros/time.h>
 #include <Eigen/Dense>
-#include <rosdyn_utilities/chain_state.h>
+#include <rosdyn_chain_state/chain_state.h>
 #include <eigen_matrix_utils/overloads.h>
 
 namespace eu = eigen_utils;

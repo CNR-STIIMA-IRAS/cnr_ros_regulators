@@ -6,7 +6,7 @@
 #include <ros/time.h>
 #include <cnr_logger/cnr_logger.h>
 #include <cnr_interpolator_interface/cnr_interpolator_interface.h>
-#include <rosdyn_utilities/chain_state.h>
+#include <rosdyn_chain_state/chain_state.h>
 
 namespace cnr
 {

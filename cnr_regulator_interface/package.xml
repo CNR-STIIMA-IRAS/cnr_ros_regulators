@@ -21,7 +21,7 @@
   <depend>pluginlib</depend>
   <depend>trajectory_msgs</depend>
   <depend>cnr_interpolator_interface</depend>
-  <depend>rosdyn_utilities</depend>
+  <depend>rosdyn_chain_state</depend>
 
   <export>
   </export>

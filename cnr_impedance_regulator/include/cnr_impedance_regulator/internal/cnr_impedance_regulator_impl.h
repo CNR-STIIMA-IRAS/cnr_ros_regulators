@@ -38,7 +38,7 @@ inline bool ImpedanceRegulator::initialize(ros::NodeHandle&  root_nh,
     std::vector<double> inertia, damping, stiffness, eff_deadband, damping_ratio;
     if(!rosparam_utilities::getParam(controller_nh, "inertia", inertia, what))
     {
-  CNR_RETURN_FALSE(this->logger(),what);
+      CNR_RETURN_FALSE(this->logger(),what);
     }
     if(inertia.size()!=this->dim())
     {
